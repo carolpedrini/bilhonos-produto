@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRODUTO.BOS | Bilhon — Portal de Produto</title>
+<meta name="description" content="Portal operacional de produto Bilhon — Dashboard, Fábrica de Produto e Arsenal.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep:#0e0d0b;--bg-primary:#131110;--bg-secondary:#1a1814;
+  --bg-card:#1e1b17;--bg-card-hover:#252219;--bg-elevated:#2a261f;--bg-surface:#17150f;
+  --text-primary:#f0ebe3;--text-secondary:#a09890;--text-muted:#6d665e;
+  --gold:#c9a55c;--gold-light:#dbb978;--gold-dark:#a88a42;
+  --gold-glow:rgba(201,165,92,.12);--gold-border:rgba(201,165,92,.18);
+  --accent-green:#5cb870;--accent-red:#c85a5a;--accent-amber:#d4a24e;--accent-blue:#5a8fc8;
+  --font-sans:'Inter',system-ui,-apple-system,sans-serif;
+  --font-serif:'Playfair Display',Georgia,serif;
+  --radius-sm:8px;--radius-md:14px;--radius-lg:20px;--radius-xl:28px;
+  --shadow-card:0 4px 24px rgba(0,0,0,.35);--shadow-glow:0 0 60px rgba(201,165,92,.08);
+  --nav-h:60px;--sidebar-w:260px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-secondary);min-height:100vh;overflow-x:hidden;line-height:1.6}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg-deep)}::-webkit-scrollbar-thumb{background:var(--gold-dark);border-radius:3px}
+
+/* ═══ LOGIN GATE ═══ */
+.login-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:5000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.login-overlay.visible{display:flex}
+.login-box{background:var(--bg-card);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-xl);padding:48px;max-width:420px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.5);position:relative;overflow:hidden}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.login-logo{margin-bottom:24px}
+.login-logo svg{width:40px;height:28px}
+.login-title{font-family:var(--font-serif);font-size:1.4rem;color:var(--text-primary);margin-bottom:8px}
+.login-subtitle{font-size:.85rem;color:var(--text-muted);margin-bottom:32px}
+.login-field{width:100%;padding:13px 18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);color:var(--text-primary);font-family:var(--font-sans);font-size:.88rem;outline:none;transition:border-color .25s;margin-bottom:16px;text-align:center;letter-spacing:.15em}
+.login-field:focus{border-color:var(--gold-border)}
+.login-field::placeholder{color:var(--text-muted);letter-spacing:.05em}
+.login-error{font-size:.78rem;color:var(--accent-red);margin-bottom:12px;display:none}
+.login-error.visible{display:block}
+.login-btn{width:100%;padding:13px;background:var(--gold);color:var(--bg-deep);border:none;border-radius:var(--radius-sm);font-family:var(--font-sans);font-size:.88rem;font-weight:600;cursor:pointer;transition:all .25s;letter-spacing:.05em}
+.login-btn:hover{background:var(--gold-light);transform:translateY(-1px)}
+.login-close{position:absolute;top:16px;right:16px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-sm);color:var(--text-muted);cursor:pointer;font-size:16px;transition:all .2s}
+.login-close:hover{border-color:var(--gold-border);color:var(--gold)}
+
+/* ═══ NAV ═══ */
+.nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:rgba(14,13,11,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);z-index:1000;display:flex;align-items:center}
+.nav-inner{width:100%;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:12px;font-weight:700;font-size:.95rem;color:var(--text-primary);letter-spacing:.08em}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-product{font-size:.82rem;color:var(--text-muted)}
+.nav-badge{padding:3px 10px;border-radius:50px;font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.nav-badge.interno{background:var(--gold-glow);color:var(--gold);border:1px solid var(--gold-border)}
+.nav-badge.admin{background:rgba(92,184,112,.1);color:var(--accent-green);border:1px solid rgba(92,184,112,.2)}
+.nav-badge.viewer{background:rgba(90,143,200,.1);color:var(--accent-blue);border:1px solid rgba(90,143,200,.2)}
+.admin-logout{padding:5px 12px;border-radius:50px;font-size:.65rem;font-weight:600;background:none;border:1px solid rgba(255,255,255,.08);color:var(--text-muted);cursor:pointer;transition:all .2s;font-family:var(--font-sans)}
+.admin-logout:hover{border-color:var(--accent-red);color:var(--accent-red)}
+
+/* ═══ LAYOUT ═══ */
+.app-layout{display:flex;padding-top:var(--nav-h);min-height:100vh}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg-deep);border-right:1px solid rgba(255,255,255,.06);height:calc(100vh - var(--nav-h));position:sticky;top:var(--nav-h);overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-header{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,.04)}
+.sidebar-label{font-size:.68rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.sidebar-title{font-size:.85rem;font-weight:500;color:var(--text-primary)}
+.sidebar-nav{padding:12px 0;flex:1}
+.sidebar-section-label{padding:16px 20px 8px;font-size:.65rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between}
+.sidebar-item{display:flex;align-items:center;gap:12px;padding:10px 20px;font-size:.82rem;color:var(--text-secondary);cursor:pointer;transition:all .25s;border-left:3px solid transparent;position:relative}
+.sidebar-item:hover{background:rgba(201,165,92,.04);color:var(--text-primary)}
+.sidebar-item.active{background:rgba(201,165,92,.06);color:var(--gold-light);border-left-color:var(--gold)}
+.sidebar-item .item-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--gold);opacity:.6;flex-shrink:0}
+.sidebar-item.active .item-icon{opacity:1}
+.sidebar-item .item-count{margin-left:auto;font-size:.7rem;font-weight:600;color:var(--text-muted);background:rgba(255,255,255,.04);padding:2px 8px;border-radius:10px}
+.sidebar-item .stage-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.04);font-size:.7rem;color:var(--text-muted);text-align:center}
+
+/* ═══ MAIN ═══ */
+.main-content{flex:1;min-width:0;overflow-y:auto;height:calc(100vh - var(--nav-h))}
+.page-view{display:none}.page-view.active{display:block}
+.container{max-width:1400px;margin:0 auto;padding:0 32px}
+.content-section{padding:48px 0;position:relative}
+.content-section + .content-section{border-top:1px solid rgba(255,255,255,.04)}
+.section-label{font-size:.75rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:block}
+.section-title{font-family:var(--font-serif);font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:400;color:var(--text-primary);margin-bottom:16px}
+.section-subtitle{font-size:1rem;color:var(--text-secondary);max-width:640px;line-height:1.8}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+
+/* ═══ STAT / TABLE / BADGE ═══ */
+.stat-card{background:var(--bg-card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-md);padding:28px;text-align:center;transition:all .35s}
+.stat-card:hover{background:var(--bg-card-hover);border-color:var(--gold-border);transform:translateY(-3px);box-shadow:var(--shadow-glow)}
+.stat-value{font-family:var(--font-serif);font-size:2.4rem;font-weight:600;color:var(--gold);line-height:1;margin-bottom:8px}
+.stat-label{font-size:.8rem;color:var(--text-secondary);line-height:1.4}
+.table-wrap{overflow-x:auto;border-radius:var(--radius-md);border:1px solid rgba(255,255,255,.06)}
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+th{background:var(--bg-elevated);padding:13px 18px;text-align:left;font-weight:600;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid rgba(255,255,255,.08)}
+td{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text-secondary);vertical-align:middle}
+tr:hover td{background:rgba(201,165,92,.03)}
+td:first-child{color:var(--text-primary);font-weight:500}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:50px;font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.badge-1{background:rgba(90,143,200,.12);color:var(--accent-blue);border:1px solid rgba(90,143,200,.2)}
+.badge-2{background:rgba(212,162,78,.12);color:var(--accent-amber);border:1px solid rgba(212,162,78,.2)}
+.badge-3{background:var(--gold-glow);color:var(--gold);border:1px solid var(--gold-border)}
+.badge-4{background:rgba(92,184,112,.12);color:var(--accent-green);border:1px solid rgba(92,184,112,.2)}
+.badge-5{background:rgba(212,162,78,.12);color:var(--accent-amber);border:1px solid rgba(212,162,78,.2)}
+.badge-6{background:rgba(92,184,112,.12);color:var(--accent-green);border:1px solid rgba(92,184,112,.2)}
+.badge-7{background:var(--gold-glow);color:var(--gold-light);border:1px solid var(--gold-border)}
+
+/* ═══ PIPELINE FACTORY ═══ */
+.factory-belt{position:relative;padding:40px 0 20px;margin:32px 0}
+.factory-belt::before{content:'';position:absolute;top:56px;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(201,165,92,.15) 10%,rgba(201,165,92,.25) 50%,rgba(201,165,92,.15) 90%,transparent)}
+.factory-belt::after{content:'';position:absolute;top:55px;left:0;width:100%;height:4px;background:repeating-linear-gradient(90deg,transparent,transparent 20px,rgba(201,165,92,.08) 20px,rgba(201,165,92,.08) 22px);animation:conveyorMove 8s linear infinite}
+@keyframes conveyorMove{0%{transform:translateX(0)}100%{transform:translateX(42px)}}
+.pipeline-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;position:relative;z-index:1}
+.pipeline-col{display:flex;flex-direction:column}
+.stage-header{position:relative;padding:16px 14px;border-radius:var(--radius-md) var(--radius-md) 0 0;background:var(--bg-card);border:1px solid rgba(255,255,255,.06);border-bottom:none;text-align:center;overflow:hidden}
+.stage-header::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius-md) var(--radius-md) 0 0}
+.stage-header[data-s="1"]::before{background:linear-gradient(90deg,transparent,var(--accent-blue),transparent)}
+.stage-header[data-s="2"]::before{background:linear-gradient(90deg,transparent,var(--accent-amber),transparent)}
+.stage-header[data-s="3"]::before{background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.stage-header[data-s="4"]::before{background:linear-gradient(90deg,transparent,var(--accent-green),transparent)}
+.stage-header[data-s="5"]::before{background:linear-gradient(90deg,transparent,var(--accent-amber),transparent)}
+.stage-header[data-s="6"]::before{background:linear-gradient(90deg,transparent,var(--accent-green),transparent)}
+.stage-header[data-s="7"]::before{background:linear-gradient(90deg,transparent,var(--gold-light),transparent)}
+.stage-icon{width:32px;height:32px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);color:var(--gold);transition:all .4s}
+.stage-header:hover .stage-icon{transform:scale(1.1);border-color:var(--gold-border);box-shadow:0 0 20px rgba(201,165,92,.12)}
+.stage-name{font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-primary);margin-top:6px}
+.stage-count-badge{margin-top:8px;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:.7rem;font-weight:700;transition:all .4s}
+.stage-count-badge[data-s="1"]{background:rgba(90,143,200,.15);color:var(--accent-blue)}.stage-count-badge[data-s="2"]{background:rgba(212,162,78,.15);color:var(--accent-amber)}.stage-count-badge[data-s="3"]{background:var(--gold-glow);color:var(--gold)}.stage-count-badge[data-s="4"]{background:rgba(92,184,112,.15);color:var(--accent-green)}.stage-count-badge[data-s="5"]{background:rgba(212,162,78,.15);color:var(--accent-amber)}.stage-count-badge[data-s="6"]{background:rgba(92,184,112,.15);color:var(--accent-green)}.stage-count-badge[data-s="7"]{background:var(--gold-glow);color:var(--gold-light)}
+.stage-count-badge.has-items{animation:countPulse 2s ease-in-out infinite}
+@keyframes countPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.pipeline-col:not(:last-child) .stage-header::after{content:'›';position:absolute;right:-8px;top:50%;transform:translateY(-50%);font-size:1.2rem;color:var(--gold);opacity:.3;z-index:2}
+.stage-body{flex:1;min-height:140px;padding:8px;background:var(--bg-card);border:1px solid rgba(255,255,255,.06);border-top:1px dashed rgba(255,255,255,.04);border-radius:0 0 var(--radius-md) var(--radius-md);transition:all .35s;display:flex;flex-direction:column;gap:6px;position:relative}
+.stage-body.drag-over{border-color:var(--gold);background:rgba(201,165,92,.03);box-shadow:inset 0 0 30px rgba(201,165,92,.06)}
+.stage-body.drag-over::after{content:'Soltar aqui';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.72rem;font-weight:600;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;opacity:.6;pointer-events:none}
+.stage-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-height:100px;opacity:.25}
+.stage-empty svg{width:24px;height:24px;color:var(--text-muted);margin-bottom:8px}
+.stage-empty span{font-size:.68rem;color:var(--text-muted);text-align:center}
+
+/* Product Card */
+.p-card{background:var(--bg-surface);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius-sm);padding:12px;transition:all .3s;position:relative;overflow:hidden}
+.p-card.draggable{cursor:grab}.p-card.draggable:hover{background:var(--bg-card-hover);border-color:var(--gold-border);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.p-card:not(.draggable){cursor:pointer}.p-card:not(.draggable):hover{background:var(--bg-card-hover);border-color:rgba(255,255,255,.1)}
+.p-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;border-radius:3px 0 0 3px}
+.p-card[data-s="1"]::before{background:var(--accent-blue)}.p-card[data-s="2"]::before{background:var(--accent-amber)}.p-card[data-s="3"]::before{background:var(--gold)}.p-card[data-s="4"]::before{background:var(--accent-green)}.p-card[data-s="5"]::before{background:var(--accent-amber)}.p-card[data-s="6"]::before{background:var(--accent-green)}.p-card[data-s="7"]::before{background:var(--gold-light)}
+.p-card.dragging{opacity:.3;cursor:grabbing;transform:rotate(2deg)}
+.p-card-name{font-size:.78rem;font-weight:600;color:var(--text-primary);margin-bottom:3px;padding-right:20px;line-height:1.3}
+.p-card-meta{font-size:.66rem;color:var(--text-muted);line-height:1.4}
+.p-card-progress{height:2px;border-radius:1px;background:rgba(255,255,255,.06);margin-top:8px;overflow:hidden}
+.p-card-progress-fill{height:100%;border-radius:1px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.p-card-progress-fill[data-s="1"]{background:var(--accent-blue)}.p-card-progress-fill[data-s="2"]{background:var(--accent-amber)}.p-card-progress-fill[data-s="3"]{background:var(--gold)}.p-card-progress-fill[data-s="4"]{background:var(--accent-green)}.p-card-progress-fill[data-s="5"]{background:var(--accent-amber)}.p-card-progress-fill[data-s="6"]{background:var(--accent-green)}.p-card-progress-fill[data-s="7"]{background:var(--gold-light)}
+.p-card-menu{position:absolute;top:8px;right:6px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--text-muted);cursor:pointer;border-radius:4px;font-size:14px;transition:all .2s;opacity:0}
+.p-card:hover .p-card-menu{opacity:1}.p-card-menu:hover{background:rgba(255,255,255,.08);color:var(--gold)}
+
+/* ADMIN-ONLY elements hidden in viewer mode */
+body.viewer .admin-only{display:none!important}
+body.viewer .p-card.draggable{cursor:pointer}
+
+/* ═══ FACTORY STATS ═══ */
+.factory-stats{display:flex;gap:12px;padding:20px 0;overflow-x:auto}
+.factory-stat{flex-shrink:0;display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--bg-card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-md);transition:all .3s;min-width:160px}
+.factory-stat:hover{border-color:var(--gold-border)}
+.factory-stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.factory-stat-icon.blue{background:rgba(90,143,200,.1);color:var(--accent-blue)}
+.factory-stat-icon.green{background:rgba(92,184,112,.1);color:var(--accent-green)}
+.factory-stat-icon.gold{background:var(--gold-glow);color:var(--gold)}
+.factory-stat-icon.amber{background:rgba(212,162,78,.1);color:var(--accent-amber)}
+.factory-stat-val{font-family:var(--font-serif);font-size:1.4rem;font-weight:600;color:var(--text-primary);line-height:1}
+.factory-stat-lbl{font-size:.7rem;color:var(--text-muted);margin-top:2px}
+
+/* ═══ CARDS ═══ */
+.card{background:var(--bg-card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-lg);padding:32px;transition:all .35s;position:relative;overflow:hidden}
+.card:hover{background:var(--bg-card-hover);border-color:var(--gold-border);transform:translateY(-3px);box-shadow:var(--shadow-glow)}
+.info-card{background:var(--bg-card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-lg);padding:32px;margin-bottom:24px;transition:all .35s}
+.info-card:hover{border-color:rgba(201,165,92,.15)}
+.info-card h3{font-family:var(--font-serif);font-size:1.2rem;font-weight:600;color:var(--gold);margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06)}
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.module-card{background:var(--bg-card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-md);padding:24px;transition:all .3s;cursor:pointer}
+.module-card:hover{border-color:var(--gold-border);transform:translateY(-2px)}
+.module-num{font-family:var(--font-serif);font-size:1.6rem;color:var(--gold);opacity:.25}
+.module-name{font-weight:600;font-size:.9rem;margin-bottom:5px;color:var(--text-primary)}
+.module-desc{font-size:.78rem;color:var(--text-muted);margin-bottom:10px}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap}
+.pill{padding:3px 9px;border-radius:4px;font-size:.68rem;font-weight:600;background:rgba(255,255,255,.04);color:var(--text-muted)}
+
+/* ═══ CONTEXT MENU ═══ */
+.context-menu{position:fixed;z-index:2000;background:var(--bg-elevated);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-sm);padding:6px 0;min-width:180px;box-shadow:0 8px 32px rgba(0,0,0,.5);display:none}
+.context-menu.visible{display:block}
+.context-menu-item{padding:9px 16px;font-size:.8rem;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .15s}
+.context-menu-item:hover{background:rgba(201,165,92,.06);color:var(--text-primary)}
+.context-menu-item.danger:hover{background:rgba(200,90,90,.08);color:var(--accent-red)}
+.context-menu-sep{height:1px;background:rgba(255,255,255,.06);margin:4px 0}
+.context-menu-item svg{width:15px;height:15px;flex-shrink:0}
+.context-submenu{padding:4px 16px 4px 42px;display:flex;flex-direction:column;gap:2px}
+.context-submenu-item{padding:6px 12px;font-size:.75rem;color:var(--text-muted);cursor:pointer;border-radius:4px;transition:all .15s;display:flex;align-items:center;gap:8px}
+.context-submenu-item:hover{background:rgba(201,165,92,.08);color:var(--text-primary)}
+.context-submenu-item .stage-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* ═══ MODAL ═══ */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);z-index:1500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.visible{display:flex}
+.modal{background:var(--bg-card);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);width:90%;max-width:600px;max-height:85vh;overflow-y:auto;box-shadow:0 16px 64px rgba(0,0,0,.5)}
+.modal-header{padding:28px 32px 0;display:flex;align-items:flex-start;justify-content:space-between}
+.modal-header h2{font-family:var(--font-serif);font-size:1.5rem;color:var(--text-primary);font-weight:500}
+.modal-close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-sm);color:var(--text-muted);cursor:pointer;font-size:18px;transition:all .2s}
+.modal-close:hover{border-color:var(--gold-border);color:var(--gold)}
+.modal-body{padding:24px 32px 32px}
+.form-group{margin-bottom:20px}
+.form-label{display:block;font-size:.78rem;font-weight:600;color:var(--text-primary);margin-bottom:8px}
+.form-input,.form-select,.form-textarea{width:100%;padding:11px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);color:var(--text-primary);font-family:var(--font-sans);font-size:.85rem;outline:none;transition:border-color .25s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold-border)}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text-muted)}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236d665e' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.form-select option{background:var(--bg-elevated);color:var(--text-primary)}
+.form-textarea{min-height:80px;resize:vertical;line-height:1.6}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.btn{padding:11px 24px;border-radius:var(--radius-sm);font-family:var(--font-sans);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .25s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--gold);color:var(--bg-deep)}.btn-primary:hover{background:var(--gold-light);transform:translateY(-1px)}
+.btn-secondary{background:rgba(255,255,255,.04);color:var(--text-secondary);border:1px solid rgba(255,255,255,.08)}.btn-secondary:hover{border-color:var(--gold-border);color:var(--text-primary)}
+.btn-danger{background:rgba(200,90,90,.1);color:var(--accent-red);border:1px solid rgba(200,90,90,.15)}.btn-danger:hover{background:rgba(200,90,90,.2)}
+.btn-sm{padding:7px 14px;font-size:.75rem}
+.btn-add{background:rgba(201,165,92,.08);color:var(--gold);border:1px dashed var(--gold-border);border-radius:var(--radius-sm);padding:10px 20px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .25s;font-family:var(--font-sans);display:inline-flex;align-items:center;gap:8px}
+.btn-add:hover{background:rgba(201,165,92,.15);border-style:solid;transform:translateY(-1px)}
+.btn-add svg{width:16px;height:16px}
+
+/* ═══ PRODUCT PANEL ═══ */
+.panel-tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:32px}
+.panel-tab{padding:12px 24px;font-size:.82rem;font-weight:500;color:var(--text-muted);cursor:pointer;transition:all .25s;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-sans)}
+.panel-tab:hover{color:var(--text-secondary)}.panel-tab.active{color:var(--gold-light);border-bottom-color:var(--gold)}
+.panel-content{display:none}.panel-content.active{display:block}
+.editable-field{position:relative;padding:10px 14px;border:1px solid transparent;border-radius:var(--radius-sm);transition:all .2s;min-height:40px}
+body:not(.viewer) .editable-field{cursor:text}
+body:not(.viewer) .editable-field:hover{border-color:rgba(255,255,255,.06);background:rgba(255,255,255,.02)}
+body:not(.viewer) .editable-field:focus-within{border-color:var(--gold-border);background:rgba(201,165,92,.04)}
+.edit-hint{position:absolute;top:8px;right:10px;font-size:.65rem;color:var(--text-muted);opacity:0;transition:opacity .2s}
+body:not(.viewer) .editable-field:hover .edit-hint{opacity:1}
+body.viewer .editable-textarea{pointer-events:none}
+.editable-textarea{background:none;border:none;color:var(--text-secondary);font-family:var(--font-sans);font-size:.85rem;width:100%;outline:none;line-height:1.7;resize:none;min-height:60px}
+.readonly-text{font-size:.85rem;color:var(--text-secondary);line-height:1.7;white-space:pre-wrap}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;color:var(--text-muted);cursor:pointer;transition:color .25s;margin-bottom:24px;background:none;border:none;font-family:var(--font-sans)}
+.back-btn:hover{color:var(--gold)}
+.progress-bar-wrap{width:100%;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold-dark),var(--gold-light));transition:width .8s ease}
+
+/* ═══ EMPTY ═══ */
+.empty-state{text-align:center;padding:60px 40px;background:var(--bg-card);border:1px dashed rgba(255,255,255,.08);border-radius:var(--radius-lg)}
+.empty-state h3{font-family:var(--font-serif);font-size:1.2rem;color:var(--text-primary);margin-bottom:8px}
+.empty-state p{font-size:.85rem;color:var(--text-muted);max-width:400px;margin:0 auto 20px}
+.big-empty{padding:80px 40px;background:linear-gradient(135deg,rgba(201,165,92,.02),transparent);border:1px dashed rgba(201,165,92,.12);border-radius:var(--radius-xl);text-align:center}
+
+/* ═══ ACTIVITY ═══ */
+.activity-feed{display:flex;flex-direction:column}
+.activity-item{display:flex;align-items:flex-start;gap:16px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.activity-dot{width:8px;height:8px;border-radius:50%;border:2px solid var(--gold);background:var(--bg-deep);flex-shrink:0;margin-top:6px}
+.activity-text{flex:1;font-size:.84rem}
+.activity-text strong{color:var(--text-primary);font-weight:600}
+.activity-time{font-size:.72rem;color:var(--text-muted);margin-top:2px}
+
+/* ═══ SEARCH / TOAST / CONFIRM ═══ */
+.search-box{padding:10px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-sm);color:var(--text-primary);font-family:var(--font-sans);font-size:.82rem;outline:none;transition:border-color .25s}
+.search-box:focus{border-color:var(--gold-border)}.search-box::placeholder{color:var(--text-muted)}
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:3000;display:flex;flex-direction:column;gap:8px}
+.toast{padding:12px 20px;background:var(--bg-elevated);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);font-size:.82rem;color:var(--text-primary);box-shadow:0 8px 32px rgba(0,0,0,.4);animation:toastIn .3s ease;display:flex;align-items:center;gap:10px}
+.toast.success{border-left:3px solid var(--accent-green)}.toast.info{border-left:3px solid var(--accent-blue)}.toast.warning{border-left:3px solid var(--accent-amber)}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.confirm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:2500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.confirm-overlay.visible{display:flex}
+.confirm-box{background:var(--bg-card);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-lg);padding:32px;max-width:420px;text-align:center}
+.confirm-box h3{font-family:var(--font-serif);color:var(--text-primary);font-size:1.2rem;margin-bottom:12px}
+.confirm-box p{font-size:.88rem;color:var(--text-secondary);margin-bottom:24px}
+.confirm-actions{display:flex;gap:12px;justify-content:center}
+
+footer{padding:32px;text-align:center;font-size:.72rem;color:var(--text-muted);border-top:1px solid rgba(255,255,255,.04)}
+.footer-admin-link{color:var(--text-muted);cursor:pointer;opacity:.3;transition:opacity .3s;text-decoration:none;border:none;background:none;font-family:var(--font-sans);font-size:.72rem}
+.footer-admin-link:hover{opacity:.7;color:var(--gold)}
+
+.stage-1{background:var(--accent-blue)}.stage-2{background:var(--accent-amber)}.stage-3{background:var(--gold)}.stage-4{background:var(--accent-green)}.stage-5{background:var(--accent-amber)}.stage-6{background:var(--accent-green)}.stage-7{background:var(--gold-light)}
+.fade-up{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}.fade-up.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:1200px){.pipeline-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:900px){.grid-2,.grid-4{grid-template-columns:1fr}.sidebar{display:none}.sidebar.mobile-open{display:flex;position:fixed;top:var(--nav-h);left:0;bottom:0;z-index:999}.mobile-menu-btn{display:flex!important}.content-section{padding:32px 0}.container{padding:0 16px}.pipeline-grid{grid-template-columns:repeat(2,1fr)}.form-row{grid-template-columns:1fr}.factory-stats{flex-wrap:wrap}}
+@media(max-width:600px){.pipeline-grid{grid-template-columns:1fr}}
+.mobile-menu-btn{display:none;align-items:center;justify-content:center;width:40px;height:40px;background:none;border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);color:var(--gold);cursor:pointer}
+</style>
+</head>
+<body class="viewer">
+
+<!-- ═══ LOGIN OVERLAY ═══ -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <button class="login-close" onclick="closeLogin()">×</button>
+    <div class="login-logo"><svg width="40" height="28" viewBox="0 0 28 20" fill="none"><path d="M2 18L8 2L14 12L20 2L26 18" stroke="#c9a55c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="login-title">Acesso Administrativo</div>
+    <div class="login-subtitle">Digite a senha para editar produtos</div>
+    <div class="login-error" id="loginError">Senha incorreta. Tente novamente.</div>
+    <input type="password" class="login-field" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')attemptLogin()">
+    <button class="login-btn" onclick="attemptLogin()">Acessar Admin</button>
+  </div>
+</div>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav"><div class="nav-inner">
+  <div style="display:flex;align-items:center;gap:16px">
+    <button class="mobile-menu-btn" onclick="toggleSidebar()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <div class="nav-logo"><svg width="28" height="20" viewBox="0 0 28 20" fill="none"><path d="M2 18L8 2L14 12L20 2L26 18" stroke="#c9a55c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>BILHON</div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-badge viewer" id="nav-mode-badge">VIEWER</span>
+    <button class="admin-logout admin-only" id="logoutBtn" onclick="logout()">Sair do Admin</button>
+    <span class="nav-product">PRODUTO.BOS</span>
+  </div>
+</div></nav>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header"><div class="sidebar-label">NAVEGAÇÃO</div><div class="sidebar-title">Fábrica de Produto</div></div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section-label">VISÕES</div>
+      <div class="sidebar-item active" data-view="dashboard" onclick="showView('dashboard')"><span class="item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dashboard</div>
+      <div class="sidebar-item" data-view="fabrica" onclick="showView('fabrica')"><span class="item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20V8l4-6h12l4 6v12H2z"/><path d="M2 8h20"/><path d="M12 8v12"/></svg></span>Fábrica<span class="item-count" id="sidebar-fabrica-count">0</span></div>
+      <div class="sidebar-item" data-view="arsenal" onclick="showView('arsenal')"><span class="item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>Arsenal<span class="item-count" id="sidebar-arsenal-count">0</span></div>
+      <div class="sidebar-item" data-view="metricas" onclick="showView('metricas')"><span class="item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Métricas</div>
+      <div class="sidebar-section-label">PRODUTOS <button class="btn-add btn-sm admin-only" onclick="openNewProductModal()" style="padding:4px 10px;font-size:.65rem">+ NOVO</button></div>
+      <div id="sidebar-products"></div>
+    </div>
+    <div class="sidebar-footer">Bilhon · Produto v2.0</div>
+  </aside>
+
+  <main class="main-content" id="mainContent">
+    <!-- DASHBOARD -->
+    <div class="page-view active" id="view-dashboard">
+      <section class="content-section"><div class="container fade-up">
+        <span class="section-label">VISÃO GERAL</span>
+        <h1 class="section-title">Dashboard de Produto</h1>
+        <p class="section-subtitle">Status consolidado de todos os produtos da operação.</p>
+        <div class="factory-stats" id="dashboard-stats"></div>
+      </div></section>
+      <section class="content-section"><div class="container fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:8px">
+          <div><span class="section-label">FÁBRICA DE PRODUTO</span><h2 class="section-title" style="margin-bottom:0">Pipeline de Produção</h2></div>
+          <button class="btn-add admin-only" onclick="openNewProductModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novo Produto</button>
+        </div>
+        <div id="dashboard-pipeline"></div>
+      </div></section>
+      <section class="content-section"><div class="container fade-up">
+        <span class="section-label">ATIVIDADE RECENTE</span>
+        <h2 class="section-title">Movimentações</h2>
+        <div class="grid-2" style="margin-top:24px">
+          <div class="card"><h3 style="font-family:var(--font-serif);color:var(--gold);font-size:1.1rem;margin-bottom:20px">Últimas Atualizações</h3><div class="activity-feed" id="activity-feed"></div></div>
+          <div class="card"><h3 style="font-family:var(--font-serif);color:var(--gold);font-size:1.1rem;margin-bottom:20px">Resumo do Pipeline</h3><div class="table-wrap"><table><thead><tr><th>Etapa</th><th>Qtd</th></tr></thead><tbody id="pipeline-summary-table"></tbody></table></div></div>
+        </div>
+      </div></section>
+    </div>
+
+    <!-- FÁBRICA -->
+    <div class="page-view" id="view-fabrica">
+      <section class="content-section"><div class="container fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:8px">
+          <div><span class="section-label">FÁBRICA DE PRODUTO</span><h2 class="section-title" style="margin-bottom:4px">Pipeline Completo</h2><p class="section-subtitle" id="fabrica-subtitle" style="margin-bottom:0"></p></div>
+          <button class="btn-add admin-only" onclick="openNewProductModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novo Produto</button>
+        </div>
+        <div style="display:flex;gap:12px;margin:20px 0;flex-wrap:wrap;align-items:center">
+          <input class="search-box" style="width:280px" placeholder="Buscar produto..." oninput="filterProducts(this.value)">
+          <span style="font-size:.75rem;color:var(--text-muted);margin-left:auto" id="fabrica-count-label"></span>
+        </div>
+        <div id="fabrica-pipeline"></div>
+      </div></section>
+    </div>
+
+    <!-- ARSENAL -->
+    <div class="page-view" id="view-arsenal">
+      <section class="content-section"><div class="container fade-up">
+        <span class="section-label">ARSENAL</span>
+        <h2 class="section-title">Biblioteca de Produtos</h2>
+        <p class="section-subtitle">Produtos maduros prontos para venda e escala.</p>
+        <div class="module-grid" style="margin-top:32px" id="arsenal-grid"></div>
+      </div></section>
+    </div>
+
+    <!-- MÉTRICAS -->
+    <div class="page-view" id="view-metricas">
+      <section class="content-section"><div class="container fade-up">
+        <span class="section-label">MÉTRICAS</span>
+        <h2 class="section-title">Performance da Fábrica</h2>
+        <div class="grid-4" style="margin-top:36px" id="metricas-stats"></div>
+        <div class="info-card" style="margin-top:32px"><h3>Distribuição por Etapa</h3><div class="table-wrap"><table><thead><tr><th>Etapa</th><th>Produtos</th><th>Qtd</th></tr></thead><tbody id="metricas-table"></tbody></table></div></div>
+      </div></section>
+    </div>
+
+    <!-- PRODUCT PANEL -->
+    <div class="page-view" id="view-product">
+      <section class="content-section"><div class="container">
+        <button class="back-btn" onclick="showView('dashboard')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Voltar ao Dashboard</button>
+        <div style="display:flex;align-items:flex-start;gap:32px;margin-bottom:40px;flex-wrap:wrap" class="fade-up">
+          <div style="flex:1;min-width:280px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+              <span class="badge" id="pp-badge"></span>
+              <button class="btn-sm btn-secondary admin-only" onclick="openEditProductModal(currentProductId)">✎ Editar</button>
+              <button class="btn-sm btn-danger admin-only" onclick="confirmDeleteProduct(currentProductId)">✕ Excluir</button>
+            </div>
+            <h2 class="section-title" id="pp-name" style="margin-bottom:8px"></h2>
+            <p class="section-subtitle" id="pp-desc" style="margin-bottom:0"></p>
+          </div>
+          <div style="display:flex;gap:16px;flex-shrink:0">
+            <div class="stat-card" style="min-width:120px"><div class="stat-value" id="pp-progress" style="font-size:1.8rem"></div><div class="stat-label">Progresso</div></div>
+            <div class="stat-card" style="min-width:120px"><div class="stat-value" id="pp-sales" style="font-size:1.8rem"></div><div class="stat-label">Vendas</div></div>
+          </div>
+        </div>
+        <div class="panel-tabs">
+          <button class="panel-tab active" data-ptab="overview" onclick="switchPanelTab('overview')">Visão Geral</button>
+          <button class="panel-tab" data-ptab="delivery" onclick="switchPanelTab('delivery')">Entrega</button>
+          <button class="panel-tab" data-ptab="economics" onclick="switchPanelTab('economics')">Economics</button>
+          <button class="panel-tab" data-ptab="funnel" onclick="switchPanelTab('funnel')">Funil</button>
+          <button class="panel-tab" data-ptab="timeline" onclick="switchPanelTab('timeline')">Timeline</button>
+        </div>
+        <div class="panel-content active" data-pcontent="overview"><div class="grid-2"><div class="info-card"><h3>DNA do Produto</h3><div class="editable-field admin-only"><textarea class="editable-textarea" id="pp-dna" placeholder="Descreva o DNA do produto aqui..." onchange="saveProductField(currentProductId,'dna',this.value)"></textarea><span class="edit-hint">clique para editar</span></div><div class="readonly-text viewer-only" id="pp-dna-view"></div></div><div class="info-card"><h3>Progresso na Fábrica</h3><div id="pp-progress-bars"></div></div></div></div>
+        <div class="panel-content" data-pcontent="delivery"><div class="info-card"><h3>Módulos de Entrega</h3><div class="editable-field admin-only"><textarea class="editable-textarea" id="pp-delivery" placeholder="Documente os módulos de entrega..." onchange="saveProductField(currentProductId,'delivery',this.value)" style="min-height:200px"></textarea><span class="edit-hint">clique para editar</span></div><div class="readonly-text viewer-only" id="pp-delivery-view"></div></div></div>
+        <div class="panel-content" data-pcontent="economics"><div class="info-card"><h3>Unit Economics</h3><div class="editable-field admin-only"><textarea class="editable-textarea" id="pp-economics" placeholder="Pricing, CAC, LTV, margem..." onchange="saveProductField(currentProductId,'economics',this.value)" style="min-height:200px"></textarea><span class="edit-hint">clique para editar</span></div><div class="readonly-text viewer-only" id="pp-economics-view"></div></div></div>
+        <div class="panel-content" data-pcontent="funnel"><div class="info-card"><h3>Blueprint do Funil</h3><div class="editable-field admin-only"><textarea class="editable-textarea" id="pp-funnel" placeholder="Landing page, VSL, copy, ads..." onchange="saveProductField(currentProductId,'funnel',this.value)" style="min-height:200px"></textarea><span class="edit-hint">clique para editar</span></div><div class="readonly-text viewer-only" id="pp-funnel-view"></div></div></div>
+        <div class="panel-content" data-pcontent="timeline"><div class="info-card"><h3>Timeline</h3><div id="pp-timeline"></div></div></div>
+      </div></section>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <p>Bilhon · PRODUTO.BOS · Documento interno · Confidencial</p>
+  <button class="footer-admin-link viewer-only" onclick="openLogin()" style="margin-top:8px">◆</button>
+</footer>
+
+<!-- CONTEXT MENU (admin only) -->
+<div class="context-menu" id="contextMenu">
+  <div class="context-menu-item" onclick="ctxOpen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Abrir Painel</div>
+  <div class="context-menu-item" onclick="ctxRename()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Renomear</div>
+  <div class="context-menu-sep"></div>
+  <div class="context-menu-item" style="color:var(--text-muted);font-size:.7rem;cursor:default;pointer-events:none">MOVER PARA</div>
+  <div class="context-submenu" id="ctx-move-options"></div>
+  <div class="context-menu-sep"></div>
+  <div class="context-menu-item danger" onclick="ctxDelete()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Excluir</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="productModal"><div class="modal">
+  <div class="modal-header"><h2 id="modal-title">Novo Produto</h2><button class="modal-close" onclick="closeModal()">×</button></div>
+  <div class="modal-body">
+    <input type="hidden" id="modal-product-id">
+    <div class="form-group"><label class="form-label">Nome do Produto</label><input class="form-input" id="modal-name" placeholder="Ex: PEOPLE.BOS"></div>
+    <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-textarea" id="modal-desc" placeholder="Descrição do produto..."></textarea></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Etapa Atual</label><select class="form-select" id="modal-stage"><option value="1">1 — Encubadora</option><option value="2">2 — Fabricando</option><option value="3">3 — DNA Desenvolvido</option><option value="4">4 — Entregáveis Prontos</option><option value="5">5 — Em Validação</option><option value="6">6 — Primeira Venda</option><option value="7">7 — Arsenal</option></select></div><div class="form-group"><label class="form-label">Ticket</label><input class="form-input" id="modal-ticket" placeholder="Ex: R$30K-180K"></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Vendas</label><input class="form-input" id="modal-sales" type="number" value="0"></div><div class="form-group"><label class="form-label">Delivery</label><input class="form-input" id="modal-delivery-weeks" placeholder="Ex: 8 semanas"></div></div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" id="modal-save-btn" onclick="saveProduct()">Criar Produto</button></div>
+  </div>
+</div></div>
+
+<!-- CONFIRM -->
+<div class="confirm-overlay" id="confirmDialog"><div class="confirm-box"><h3 id="confirm-title">Confirmar</h3><p id="confirm-msg">Tem certeza?</p><div class="confirm-actions"><button class="btn btn-secondary" onclick="closeConfirm()">Cancelar</button><button class="btn btn-danger" id="confirm-action-btn">Excluir</button></div></div></div>
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ═══ CONFIG ═══
+const ADMIN_PASSWORD = 'bilhon2026';
+const SN=['','Encubadora','Fabricando','DNA Desenvolvido','Entregáveis Prontos','Em Validação','Primeira Venda','Arsenal'];
+const SP=[0,15,30,45,60,75,88,100];
+const STAGE_ICONS=[
+  '',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="14" rx="8" ry="7"/><path d="M9 3c0 0 1-1 3-1s3 1 3 1"/><path d="M12 7v3"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 00-8 0v2"/><circle cx="12" cy="15" r="1"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><path d="M8 7h8M8 11h6"/></svg>'
+];
+
+let products=[],activityLog=[],currentProductId=null,ctxProductId=null,draggedProductId=null;
+let isAdmin=false;
+
+// ═══ AUTH ═══
+function openLogin(){document.getElementById('loginOverlay').classList.add('visible');document.getElementById('loginPassword').focus();document.getElementById('loginError').classList.remove('visible');}
+function closeLogin(){document.getElementById('loginOverlay').classList.remove('visible');document.getElementById('loginPassword').value='';}
+function attemptLogin(){
+  const pw=document.getElementById('loginPassword').value;
+  if(pw===ADMIN_PASSWORD){isAdmin=true;sessionStorage.setItem('produtobos_admin','1');applyMode();closeLogin();toast('Modo Admin ativado','success');}
+  else{document.getElementById('loginError').classList.add('visible');}
+}
+function logout(){isAdmin=false;sessionStorage.removeItem('produtobos_admin');applyMode();toast('Modo Viewer ativado','info');}
+function applyMode(){
+  document.body.classList.toggle('viewer',!isAdmin);
+  const badge=document.getElementById('nav-mode-badge');
+  if(isAdmin){badge.textContent='ADMIN';badge.className='nav-badge admin';}
+  else{badge.textContent='VIEWER';badge.className='nav-badge viewer';}
+  // Toggle viewer-only elements
+  document.querySelectorAll('.viewer-only').forEach(el=>{el.style.display=isAdmin?'none':'';});
+  document.querySelectorAll('.admin-only').forEach(el=>{el.style.display=isAdmin?'':'none';});
+  renderAll();
+}
+
+// ═══ DATA ═══
+function loadData(){
+  const s=localStorage.getItem('produtobos_v2_products');products=s?JSON.parse(s):[];
+  const l=localStorage.getItem('produtobos_v2_activity');activityLog=l?JSON.parse(l):[];
+}
+function saveData(){localStorage.setItem('produtobos_v2_products',JSON.stringify(products));localStorage.setItem('produtobos_v2_activity',JSON.stringify(activityLog));}
+function addActivity(t){activityLog.unshift({text:t,time:new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})});if(activityLog.length>50)activityLog.length=50;saveData();}
+function getProduct(id){return products.find(p=>p.id===id);}
+function genId(n){return n.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'')+'-'+Date.now().toString(36);}
+
+// ═══ RENDER ═══
+function renderAll(){renderSidebar();renderDashboard();renderFabrica();renderArsenal();renderMetricas();if(currentProductId)renderProductPanel(currentProductId);setTimeout(triggerFadeUp,100);}
+
+function renderSidebar(){
+  document.getElementById('sidebar-products').innerHTML=products.map(p=>`<div class="sidebar-item ${currentProductId===p.id?'active':''}" data-product="${p.id}" onclick="showProduct('${p.id}')"><span class="stage-dot stage-${p.stage}"></span>${p.name}</div>`).join('');
+  document.getElementById('sidebar-fabrica-count').textContent=products.length;
+  document.getElementById('sidebar-arsenal-count').textContent=products.filter(p=>p.stage===7).length;
+}
+
+function renderDashboard(){
+  const a=products.filter(p=>p.stage===7).length,r=products.filter(p=>p.stage>=6).length,s=products.reduce((a,p)=>a+p.sales,0),f=products.filter(p=>p.stage<7).length;
+  document.getElementById('dashboard-stats').innerHTML=`
+    <div class="factory-stat"><div class="factory-stat-icon gold"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><div><div class="factory-stat-val">${a}</div><div class="factory-stat-lbl">No Arsenal</div></div></div>
+    <div class="factory-stat"><div class="factory-stat-icon green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div><div><div class="factory-stat-val">${r}</div><div class="factory-stat-lbl">Prontos p/ Venda</div></div></div>
+    <div class="factory-stat"><div class="factory-stat-icon blue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div><div class="factory-stat-val">${s}</div><div class="factory-stat-lbl">Total Vendidos</div></div></div>
+    <div class="factory-stat"><div class="factory-stat-icon amber"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg></div><div><div class="factory-stat-val">${f}</div><div class="factory-stat-lbl">Em Fabricação</div></div></div>`;
+  document.getElementById('dashboard-pipeline').innerHTML=buildPipelineHTML();renderActivityFeed();renderPipelineSummary();
+}
+
+function renderFabrica(){
+  document.getElementById('fabrica-pipeline').innerHTML=buildPipelineHTML();
+  document.getElementById('fabrica-count-label').textContent=`${products.length} produto${products.length!==1?'s':''} · 7 etapas`;
+  document.getElementById('fabrica-subtitle').textContent=isAdmin?'Arraste produtos entre etapas · Clique no ⋮ para editar':'Visão completa do pipeline de produção';
+}
+
+function buildPipelineHTML(){
+  let h='<div class="factory-belt"><div class="pipeline-grid">';
+  for(let s=1;s<=7;s++){
+    const sp=products.filter(p=>p.stage===s),has=sp.length>0;
+    const dragAttrs=isAdmin?`ondragover="onDragOver(event)" ondrop="onDrop(event,${s})" ondragleave="onDragLeave(event)"`:'';
+    h+=`<div class="pipeline-col"><div class="stage-header" data-s="${s}"><div class="stage-icon">${STAGE_ICONS[s]}</div><div class="stage-name">${SN[s]}</div><div class="stage-count-badge ${has?'has-items':''}" data-s="${s}">${sp.length}</div></div>
+    <div class="stage-body" data-stage="${s}" ${dragAttrs}>
+      ${sp.length?sp.map(p=>{
+        const drag=isAdmin?`draggable="true" ondragstart="onDragStart(event,'${p.id}')" ondragend="onDragEnd(event)"`:'';
+        const menu=isAdmin?`<button class="p-card-menu" onclick="event.stopPropagation();openContextMenu(event,'${p.id}')">⋮</button>`:'';
+        return `<div class="p-card ${isAdmin?'draggable':''}" data-id="${p.id}" data-s="${s}" ${drag} onclick="showProduct('${p.id}')"><div class="p-card-name">${p.name}</div><div class="p-card-meta">${p.desc?p.desc.substring(0,45)+(p.desc.length>45?'...':''):'Sem descrição'}</div><div class="p-card-progress"><div class="p-card-progress-fill" data-s="${s}" style="width:${SP[s]}%"></div></div>${menu}</div>`;
+      }).join(''):`<div class="stage-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>${isAdmin?'Arraste ou<br>adicione':'Vazio'}</span></div>`}
+    </div></div>`;
+  }
+  return h+'</div></div>';
+}
+
+function renderArsenal(){
+  const ap=products.filter(p=>p.stage===7);
+  document.getElementById('arsenal-grid').innerHTML=ap.length?ap.map((p,i)=>`<div class="module-card" onclick="showProduct('${p.id}')"><div class="module-num">${String(i+1).padStart(2,'0')}</div><div class="module-name">${p.name}</div><div class="module-desc">${p.desc||'Sem descrição'}</div><div class="pill-row"><span class="pill">${p.sales} vendas</span><span class="pill">${p.ticket||'—'}</span><span class="pill">${p.deliveryWeeks||'—'}</span></div></div>`).join(''):
+  `<div class="big-empty"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1" style="opacity:.15;margin-bottom:16px"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><h3 style="font-family:var(--font-serif);font-size:1.3rem;color:var(--text-primary);margin-bottom:8px">Arsenal Vazio</h3><p style="font-size:.88rem;color:var(--text-muted);max-width:400px;margin:0 auto 20px">Produtos que completarem todas as 7 etapas aparecerão aqui.</p>${isAdmin?'<button class="btn-add" onclick="openNewProductModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Criar Primeiro Produto</button>':''}</div>`;
+}
+
+function renderMetricas(){
+  const t=products.length,ar=products.filter(p=>p.stage===7).length,c=t?Math.round((ar/t)*100):0,sv=t?(products.reduce((a,p)=>a+p.sales,0)/t).toFixed(1):0;
+  document.getElementById('metricas-stats').innerHTML=`<div class="stat-card"><div class="stat-value">${t}</div><div class="stat-label">Total</div></div><div class="stat-card"><div class="stat-value">${c}%</div><div class="stat-label">Conclusão</div></div><div class="stat-card"><div class="stat-value">${sv}</div><div class="stat-label">Média Vendas</div></div><div class="stat-card"><div class="stat-value">${ar}</div><div class="stat-label">Arsenal</div></div>`;
+  let tb='';for(let s=1;s<=7;s++){const sp=products.filter(p=>p.stage===s);tb+=`<tr><td><span class="stage-dot stage-${s}" style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle"></span>${SN[s]}</td><td>${sp.map(p=>p.name).join(', ')||'—'}</td><td>${sp.length}</td></tr>`;}
+  document.getElementById('metricas-table').innerHTML=tb;
+}
+
+function renderActivityFeed(){document.getElementById('activity-feed').innerHTML=activityLog.slice(0,8).map(a=>`<div class="activity-item"><div class="activity-dot"></div><div class="activity-text">${a.text}<div class="activity-time">${a.time}</div></div></div>`).join('')||'<p style="font-size:.85rem;color:var(--text-muted);padding:20px 0">Nenhuma atividade registrada.</p>';}
+function renderPipelineSummary(){let h='';for(let s=1;s<=7;s++){h+=`<tr><td><span class="stage-dot stage-${s}" style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle"></span>${SN[s]}</td><td>${products.filter(p=>p.stage===s).length}</td></tr>`;}document.getElementById('pipeline-summary-table').innerHTML=h;}
+
+function renderProductPanel(id){
+  const p=getProduct(id);if(!p)return;currentProductId=id;
+  document.getElementById('pp-name').textContent=p.name;
+  document.getElementById('pp-desc').textContent=p.desc||'Sem descrição';
+  document.getElementById('pp-progress').textContent=SP[p.stage]+'%';
+  document.getElementById('pp-sales').textContent=p.sales;
+  const b=document.getElementById('pp-badge');b.className='badge badge-'+p.stage;b.textContent='● '+SN[p.stage].toUpperCase();
+  // Admin fields
+  document.getElementById('pp-dna').value=p.dna||'';
+  document.getElementById('pp-delivery').value=p.delivery||'';
+  document.getElementById('pp-economics').value=p.economics||'';
+  document.getElementById('pp-funnel').value=p.funnel||'';
+  // Viewer fields
+  document.getElementById('pp-dna-view').textContent=p.dna||'Informação ainda não cadastrada.';
+  document.getElementById('pp-delivery-view').textContent=p.delivery||'Informação ainda não cadastrada.';
+  document.getElementById('pp-economics-view').textContent=p.economics||'Informação ainda não cadastrada.';
+  document.getElementById('pp-funnel-view').textContent=p.funnel||'Informação ainda não cadastrada.';
+  let bars='';for(let s=1;s<=7;s++){const d=s<p.stage,c=s===p.stage,w=d?100:c?60:0;const i=d?'✓':c?'●':'—';const ic=d?'var(--accent-green)':c?'var(--gold)':'var(--text-muted)';bars+=`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.82rem;color:var(--text-primary)">${SN[s]}</span><span style="font-size:.72rem;color:${ic}">${i}</span></div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${w}%"></div></div></div>`;}
+  document.getElementById('pp-progress-bars').innerHTML=bars;
+  const tl=activityLog.filter(a=>a.text.includes(p.name));
+  document.getElementById('pp-timeline').innerHTML=tl.length?'<div class="activity-feed">'+tl.map(a=>`<div class="activity-item"><div class="activity-dot"></div><div class="activity-text">${a.text}<div class="activity-time">${a.time}</div></div></div>`).join('')+'</div>':'<p style="font-size:.85rem;color:var(--text-muted);padding:20px 0">Nenhuma movimentação registrada.</p>';
+  applyMode();
+}
+
+function saveProductField(id,f,v){const p=getProduct(id);if(p){p[f]=v;saveData();toast('Salvo','success');}}
+
+// ═══ NAV ═══
+function showView(v){document.querySelectorAll('.page-view').forEach(p=>p.classList.remove('active'));document.getElementById('view-'+v).classList.add('active');document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));const s=document.querySelector(`.sidebar-item[data-view="${v}"]`);if(s)s.classList.add('active');document.getElementById('mainContent').scrollTop=0;currentProductId=null;renderAll();closeSidebar();}
+function showProduct(id){const p=getProduct(id);if(!p)return;currentProductId=id;document.querySelectorAll('.page-view').forEach(v=>v.classList.remove('active'));document.getElementById('view-product').classList.add('active');document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));const s=document.querySelector(`.sidebar-item[data-product="${id}"]`);if(s)s.classList.add('active');switchPanelTab('overview');renderProductPanel(id);document.getElementById('mainContent').scrollTop=0;setTimeout(triggerFadeUp,100);closeSidebar();}
+function switchPanelTab(t){document.querySelectorAll('.panel-tab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.panel-content').forEach(c=>c.classList.remove('active'));document.querySelector(`.panel-tab[data-ptab="${t}"]`).classList.add('active');document.querySelector(`.panel-content[data-pcontent="${t}"]`).classList.add('active');}
+
+// ═══ DRAG & DROP (admin only) ═══
+function onDragStart(e,id){if(!isAdmin)return;draggedProductId=id;e.dataTransfer.effectAllowed='move';e.target.classList.add('dragging');}
+function onDragEnd(e){e.target.classList.remove('dragging');draggedProductId=null;}
+function onDragOver(e){if(!isAdmin)return;e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-over');}
+function onDragLeave(e){e.currentTarget.classList.remove('drag-over');}
+function onDrop(e,ns){if(!isAdmin)return;e.preventDefault();e.currentTarget.classList.remove('drag-over');if(!draggedProductId)return;moveProduct(draggedProductId,ns);draggedProductId=null;}
+function moveProduct(id,ns){const p=getProduct(id);if(!p||p.stage===ns)return;const os=p.stage;p.stage=ns;addActivity(`<strong>${p.name}</strong> movido de <strong>${SN[os]}</strong> → <strong>${SN[ns]}</strong>`);saveData();renderAll();toast(`${p.name} → ${SN[ns]}`,'success');}
+
+// ═══ CONTEXT MENU ═══
+function openContextMenu(e,id){if(!isAdmin)return;ctxProductId=id;const m=document.getElementById('contextMenu');const p=getProduct(id);if(!p)return;let h='';for(let s=1;s<=7;s++){if(s===p.stage)continue;h+=`<div class="context-submenu-item" onclick="ctxMoveTo(${s})"><span class="stage-dot stage-${s}"></span>${SN[s]}</div>`;}document.getElementById('ctx-move-options').innerHTML=h;m.style.left=Math.min(e.clientX,window.innerWidth-200)+'px';m.style.top=Math.min(e.clientY,window.innerHeight-350)+'px';m.classList.add('visible');e.stopPropagation();}
+document.addEventListener('click',()=>document.getElementById('contextMenu').classList.remove('visible'));
+function ctxOpen(){document.getElementById('contextMenu').classList.remove('visible');if(ctxProductId)showProduct(ctxProductId);}
+function ctxRename(){document.getElementById('contextMenu').classList.remove('visible');const p=getProduct(ctxProductId);if(!p)return;const n=prompt('Novo nome:',p.name);if(n&&n.trim()){const o=p.name;p.name=n.trim();addActivity(`<strong>${o}</strong> renomeado para <strong>${p.name}</strong>`);saveData();renderAll();toast('Renomeado','success');}}
+function ctxMoveTo(s){document.getElementById('contextMenu').classList.remove('visible');if(ctxProductId)moveProduct(ctxProductId,s);}
+function ctxDelete(){document.getElementById('contextMenu').classList.remove('visible');if(ctxProductId)confirmDeleteProduct(ctxProductId);}
+
+// ═══ MODAL ═══
+function openNewProductModal(){if(!isAdmin)return;document.getElementById('modal-title').textContent='Novo Produto';document.getElementById('modal-save-btn').textContent='Criar Produto';document.getElementById('modal-product-id').value='';document.getElementById('modal-name').value='';document.getElementById('modal-desc').value='';document.getElementById('modal-stage').value='1';document.getElementById('modal-ticket').value='';document.getElementById('modal-sales').value='0';document.getElementById('modal-delivery-weeks').value='';document.getElementById('productModal').classList.add('visible');document.getElementById('modal-name').focus();}
+function openEditProductModal(id){if(!isAdmin)return;const p=getProduct(id);if(!p)return;document.getElementById('modal-title').textContent='Editar Produto';document.getElementById('modal-save-btn').textContent='Salvar';document.getElementById('modal-product-id').value=p.id;document.getElementById('modal-name').value=p.name;document.getElementById('modal-desc').value=p.desc;document.getElementById('modal-stage').value=p.stage;document.getElementById('modal-ticket').value=p.ticket||'';document.getElementById('modal-sales').value=p.sales||0;document.getElementById('modal-delivery-weeks').value=p.deliveryWeeks||'';document.getElementById('productModal').classList.add('visible');}
+function closeModal(){document.getElementById('productModal').classList.remove('visible');}
+function saveProduct(){const id=document.getElementById('modal-product-id').value,n=document.getElementById('modal-name').value.trim(),d=document.getElementById('modal-desc').value.trim(),st=parseInt(document.getElementById('modal-stage').value),tk=document.getElementById('modal-ticket').value.trim(),sl=parseInt(document.getElementById('modal-sales').value)||0,dw=document.getElementById('modal-delivery-weeks').value.trim();if(!n){toast('Nome obrigatório','warning');return;}if(id){const p=getProduct(id);if(!p)return;const os=p.stage;p.name=n;p.desc=d;p.stage=st;p.ticket=tk;p.sales=sl;p.deliveryWeeks=dw;if(os!==st)addActivity(`<strong>${p.name}</strong> movido para <strong>${SN[st]}</strong>`);addActivity(`<strong>${p.name}</strong> atualizado`);toast('Atualizado','success');}else{products.push({id:genId(n),name:n,desc:d,stage:st,sales:sl,ticket:tk,deliveryWeeks:dw,dna:'',delivery:'',economics:'',funnel:'',createdAt:new Date().toISOString().split('T')[0]});addActivity(`<strong>${n}</strong> criado em <strong>${SN[st]}</strong>`);toast('Produto criado!','success');}saveData();closeModal();renderAll();}
+function confirmDeleteProduct(id){if(!isAdmin)return;const p=getProduct(id);if(!p)return;document.getElementById('confirm-title').textContent='Excluir Produto';document.getElementById('confirm-msg').textContent=`Excluir "${p.name}"?`;document.getElementById('confirm-action-btn').onclick=()=>{deleteProduct(id);closeConfirm();};document.getElementById('confirmDialog').classList.add('visible');}
+function closeConfirm(){document.getElementById('confirmDialog').classList.remove('visible');}
+function deleteProduct(id){const p=getProduct(id);if(!p)return;const n=p.name;products=products.filter(x=>x.id!==id);addActivity(`<strong>${n}</strong> excluído`);saveData();if(currentProductId===id){currentProductId=null;showView('dashboard');}else renderAll();toast(`${n} excluído`,'info');}
+function filterProducts(q){q=q.toLowerCase();document.querySelectorAll('#view-fabrica .p-card').forEach(c=>{const n=c.querySelector('.p-card-name').textContent.toLowerCase();const m=c.querySelector('.p-card-meta').textContent.toLowerCase();c.style.display=(n.includes(q)||m.includes(q))?'':'none';});}
+
+// ═══ UTILS ═══
+function toast(m,t='info'){const c=document.getElementById('toastContainer');const e=document.createElement('div');e.className='toast '+t;e.innerHTML=m;c.appendChild(e);setTimeout(()=>{e.style.opacity='0';e.style.transform='translateY(16px)';e.style.transition='all .3s';setTimeout(()=>e.remove(),300);},2500);}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('mobile-open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('mobile-open');}
+function triggerFadeUp(){const o=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.1});document.querySelectorAll('.fade-up:not(.visible)').forEach(e=>o.observe(e));}
+
+// ═══ INIT ═══
+document.addEventListener('DOMContentLoaded',()=>{
+  loadData();
+  // Check if admin session exists
+  if(sessionStorage.getItem('produtobos_admin')==='1') isAdmin=true;
+  applyMode();
+});
+</script>
+</body>
+</html>
