@@ -458,9 +458,13 @@ footer{padding:32px;text-align:center;font-size:.72rem;color:var(--text-muted);b
 <div class="confirm-overlay" id="confirmDialog"><div class="confirm-box"><h3 id="confirm-title">Confirmar</h3><p id="confirm-msg">Tem certeza?</p><div class="confirm-actions"><button class="btn btn-secondary" onclick="closeConfirm()">Cancelar</button><button class="btn btn-danger" id="confirm-action-btn">Excluir</button></div></div></div>
 <div class="toast-container" id="toastContainer"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ═══ CONFIG ═══
-const ADMIN_PASSWORD = 'bilhon2026';
+// ═══ SUPABASE CONFIG ═══
+const SUPABASE_URL='https://zlallwsgmvnvvtjutqcq.supabase.co';
+const SUPABASE_KEY='sb_publishable_wF3TwgzFKBSPkyg3d8Ecjw_djXUpHgD';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
 const SN=['','Encubadora','Fabricando','DNA Desenvolvido','Entregáveis Prontos','Em Validação','Primeira Venda','Arsenal'];
 const SP=[0,15,30,45,60,75,88,100];
 const STAGE_ICONS=[
@@ -477,33 +481,44 @@ const STAGE_ICONS=[
 let products=[],activityLog=[],currentProductId=null,ctxProductId=null,draggedProductId=null;
 let isAdmin=false;
 
-// ═══ AUTH ═══
+// ═══ AUTH (Supabase Auth) ═══
 function openLogin(){document.getElementById('loginOverlay').classList.add('visible');document.getElementById('loginPassword').focus();document.getElementById('loginError').classList.remove('visible');}
 function closeLogin(){document.getElementById('loginOverlay').classList.remove('visible');document.getElementById('loginPassword').value='';}
-function attemptLogin(){
+async function attemptLogin(){
   const pw=document.getElementById('loginPassword').value;
-  if(pw===ADMIN_PASSWORD){isAdmin=true;sessionStorage.setItem('produtobos_admin','1');applyMode();closeLogin();toast('Modo Admin ativado','success');}
-  else{document.getElementById('loginError').classList.add('visible');}
+  const{data,error}=await sb.auth.signInWithPassword({email:'carolina@bilhon.com',password:pw});
+  if(error){document.getElementById('loginError').classList.add('visible');return;}
+  isAdmin=true;applyMode();closeLogin();toast('Modo Admin ativado','success');
 }
-function logout(){isAdmin=false;sessionStorage.removeItem('produtobos_admin');applyMode();toast('Modo Viewer ativado','info');}
+async function logout(){await sb.auth.signOut();isAdmin=false;applyMode();toast('Modo Viewer ativado','info');}
 function applyMode(){
   document.body.classList.toggle('viewer',!isAdmin);
   const badge=document.getElementById('nav-mode-badge');
   if(isAdmin){badge.textContent='ADMIN';badge.className='nav-badge admin';}
   else{badge.textContent='VIEWER';badge.className='nav-badge viewer';}
-  // Toggle viewer-only elements
   document.querySelectorAll('.viewer-only').forEach(el=>{el.style.display=isAdmin?'none':'';});
   document.querySelectorAll('.admin-only').forEach(el=>{el.style.display=isAdmin?'':'none';});
   renderAll();
 }
 
-// ═══ DATA ═══
-function loadData(){
-  const s=localStorage.getItem('produtobos_v2_products');products=s?JSON.parse(s):[];
-  const l=localStorage.getItem('produtobos_v2_activity');activityLog=l?JSON.parse(l):[];
+// ═══ DATA (Supabase) ═══
+async function loadData(){
+  const{data:prods}=await sb.from('products').select('*').order('created_at',{ascending:true});
+  products=(prods||[]).map(r=>({id:r.id,name:r.name,desc:r.description,stage:r.stage,sales:r.sales||0,ticket:r.ticket||'',deliveryWeeks:r.delivery_weeks||'',dna:r.dna||'',delivery:r.delivery||'',economics:r.economics||'',funnel:r.funnel||'',createdAt:r.created_at}));
+  const{data:acts}=await sb.from('activity_log').select('*').order('created_at',{ascending:false}).limit(50);
+  activityLog=(acts||[]).map(a=>({text:a.text,time:new Date(a.created_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}));
 }
-function saveData(){localStorage.setItem('produtobos_v2_products',JSON.stringify(products));localStorage.setItem('produtobos_v2_activity',JSON.stringify(activityLog));}
-function addActivity(t){activityLog.unshift({text:t,time:new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})});if(activityLog.length>50)activityLog.length=50;saveData();}
+async function saveProductToDB(p){
+  await sb.from('products').upsert({id:p.id,name:p.name,description:p.desc,stage:p.stage,sales:p.sales,ticket:p.ticket,delivery_weeks:p.deliveryWeeks,dna:p.dna,delivery:p.delivery,economics:p.economics,funnel:p.funnel,updated_at:new Date().toISOString()});
+}
+async function deleteProductFromDB(id){await sb.from('products').delete().eq('id',id);}
+async function addActivity(t){
+  await sb.from('activity_log').insert({text:t});
+  activityLog.unshift({text:t,time:new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})});
+  if(activityLog.length>50)activityLog.length=50;
+}
+// saveData kept as no-op for compatibility — individual ops call saveProductToDB
+async function saveData(){}
 function getProduct(id){return products.find(p=>p.id===id);}
 function genId(n){return n.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'')+'-'+Date.now().toString(36);}
 
@@ -572,12 +587,10 @@ function renderProductPanel(id){
   document.getElementById('pp-progress').textContent=SP[p.stage]+'%';
   document.getElementById('pp-sales').textContent=p.sales;
   const b=document.getElementById('pp-badge');b.className='badge badge-'+p.stage;b.textContent='● '+SN[p.stage].toUpperCase();
-  // Admin fields
   document.getElementById('pp-dna').value=p.dna||'';
   document.getElementById('pp-delivery').value=p.delivery||'';
   document.getElementById('pp-economics').value=p.economics||'';
   document.getElementById('pp-funnel').value=p.funnel||'';
-  // Viewer fields
   document.getElementById('pp-dna-view').textContent=p.dna||'Informação ainda não cadastrada.';
   document.getElementById('pp-delivery-view').textContent=p.delivery||'Informação ainda não cadastrada.';
   document.getElementById('pp-economics-view').textContent=p.economics||'Informação ainda não cadastrada.';
@@ -589,7 +602,7 @@ function renderProductPanel(id){
   applyMode();
 }
 
-function saveProductField(id,f,v){const p=getProduct(id);if(p){p[f]=v;saveData();toast('Salvo','success');}}
+async function saveProductField(id,f,v){const p=getProduct(id);if(p){p[f]=v;await saveProductToDB(p);toast('Salvo','success');}}
 
 // ═══ NAV ═══
 function showView(v){document.querySelectorAll('.page-view').forEach(p=>p.classList.remove('active'));document.getElementById('view-'+v).classList.add('active');document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));const s=document.querySelector(`.sidebar-item[data-view="${v}"]`);if(s)s.classList.add('active');document.getElementById('mainContent').scrollTop=0;currentProductId=null;renderAll();closeSidebar();}
@@ -602,13 +615,13 @@ function onDragEnd(e){e.target.classList.remove('dragging');draggedProductId=nul
 function onDragOver(e){if(!isAdmin)return;e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-over');}
 function onDragLeave(e){e.currentTarget.classList.remove('drag-over');}
 function onDrop(e,ns){if(!isAdmin)return;e.preventDefault();e.currentTarget.classList.remove('drag-over');if(!draggedProductId)return;moveProduct(draggedProductId,ns);draggedProductId=null;}
-function moveProduct(id,ns){const p=getProduct(id);if(!p||p.stage===ns)return;const os=p.stage;p.stage=ns;addActivity(`<strong>${p.name}</strong> movido de <strong>${SN[os]}</strong> → <strong>${SN[ns]}</strong>`);saveData();renderAll();toast(`${p.name} → ${SN[ns]}`,'success');}
+async function moveProduct(id,ns){const p=getProduct(id);if(!p||p.stage===ns)return;const os=p.stage;p.stage=ns;await addActivity(`<strong>${p.name}</strong> movido de <strong>${SN[os]}</strong> → <strong>${SN[ns]}</strong>`);await saveProductToDB(p);renderAll();toast(`${p.name} → ${SN[ns]}`,'success');}
 
 // ═══ CONTEXT MENU ═══
 function openContextMenu(e,id){if(!isAdmin)return;ctxProductId=id;const m=document.getElementById('contextMenu');const p=getProduct(id);if(!p)return;let h='';for(let s=1;s<=7;s++){if(s===p.stage)continue;h+=`<div class="context-submenu-item" onclick="ctxMoveTo(${s})"><span class="stage-dot stage-${s}"></span>${SN[s]}</div>`;}document.getElementById('ctx-move-options').innerHTML=h;m.style.left=Math.min(e.clientX,window.innerWidth-200)+'px';m.style.top=Math.min(e.clientY,window.innerHeight-350)+'px';m.classList.add('visible');e.stopPropagation();}
 document.addEventListener('click',()=>document.getElementById('contextMenu').classList.remove('visible'));
 function ctxOpen(){document.getElementById('contextMenu').classList.remove('visible');if(ctxProductId)showProduct(ctxProductId);}
-function ctxRename(){document.getElementById('contextMenu').classList.remove('visible');const p=getProduct(ctxProductId);if(!p)return;const n=prompt('Novo nome:',p.name);if(n&&n.trim()){const o=p.name;p.name=n.trim();addActivity(`<strong>${o}</strong> renomeado para <strong>${p.name}</strong>`);saveData();renderAll();toast('Renomeado','success');}}
+async function ctxRename(){document.getElementById('contextMenu').classList.remove('visible');const p=getProduct(ctxProductId);if(!p)return;const n=prompt('Novo nome:',p.name);if(n&&n.trim()){const o=p.name;p.name=n.trim();await addActivity(`<strong>${o}</strong> renomeado para <strong>${p.name}</strong>`);await saveProductToDB(p);renderAll();toast('Renomeado','success');}}
 function ctxMoveTo(s){document.getElementById('contextMenu').classList.remove('visible');if(ctxProductId)moveProduct(ctxProductId,s);}
 function ctxDelete(){document.getElementById('contextMenu').classList.remove('visible');if(ctxProductId)confirmDeleteProduct(ctxProductId);}
 
@@ -616,10 +629,10 @@ function ctxDelete(){document.getElementById('contextMenu').classList.remove('vi
 function openNewProductModal(){if(!isAdmin)return;document.getElementById('modal-title').textContent='Novo Produto';document.getElementById('modal-save-btn').textContent='Criar Produto';document.getElementById('modal-product-id').value='';document.getElementById('modal-name').value='';document.getElementById('modal-desc').value='';document.getElementById('modal-stage').value='1';document.getElementById('modal-ticket').value='';document.getElementById('modal-sales').value='0';document.getElementById('modal-delivery-weeks').value='';document.getElementById('productModal').classList.add('visible');document.getElementById('modal-name').focus();}
 function openEditProductModal(id){if(!isAdmin)return;const p=getProduct(id);if(!p)return;document.getElementById('modal-title').textContent='Editar Produto';document.getElementById('modal-save-btn').textContent='Salvar';document.getElementById('modal-product-id').value=p.id;document.getElementById('modal-name').value=p.name;document.getElementById('modal-desc').value=p.desc;document.getElementById('modal-stage').value=p.stage;document.getElementById('modal-ticket').value=p.ticket||'';document.getElementById('modal-sales').value=p.sales||0;document.getElementById('modal-delivery-weeks').value=p.deliveryWeeks||'';document.getElementById('productModal').classList.add('visible');}
 function closeModal(){document.getElementById('productModal').classList.remove('visible');}
-function saveProduct(){const id=document.getElementById('modal-product-id').value,n=document.getElementById('modal-name').value.trim(),d=document.getElementById('modal-desc').value.trim(),st=parseInt(document.getElementById('modal-stage').value),tk=document.getElementById('modal-ticket').value.trim(),sl=parseInt(document.getElementById('modal-sales').value)||0,dw=document.getElementById('modal-delivery-weeks').value.trim();if(!n){toast('Nome obrigatório','warning');return;}if(id){const p=getProduct(id);if(!p)return;const os=p.stage;p.name=n;p.desc=d;p.stage=st;p.ticket=tk;p.sales=sl;p.deliveryWeeks=dw;if(os!==st)addActivity(`<strong>${p.name}</strong> movido para <strong>${SN[st]}</strong>`);addActivity(`<strong>${p.name}</strong> atualizado`);toast('Atualizado','success');}else{products.push({id:genId(n),name:n,desc:d,stage:st,sales:sl,ticket:tk,deliveryWeeks:dw,dna:'',delivery:'',economics:'',funnel:'',createdAt:new Date().toISOString().split('T')[0]});addActivity(`<strong>${n}</strong> criado em <strong>${SN[st]}</strong>`);toast('Produto criado!','success');}saveData();closeModal();renderAll();}
+async function saveProduct(){const id=document.getElementById('modal-product-id').value,n=document.getElementById('modal-name').value.trim(),d=document.getElementById('modal-desc').value.trim(),st=parseInt(document.getElementById('modal-stage').value),tk=document.getElementById('modal-ticket').value.trim(),sl=parseInt(document.getElementById('modal-sales').value)||0,dw=document.getElementById('modal-delivery-weeks').value.trim();if(!n){toast('Nome obrigatório','warning');return;}if(id){const p=getProduct(id);if(!p)return;const os=p.stage;p.name=n;p.desc=d;p.stage=st;p.ticket=tk;p.sales=sl;p.deliveryWeeks=dw;if(os!==st)await addActivity(`<strong>${p.name}</strong> movido para <strong>${SN[st]}</strong>`);await addActivity(`<strong>${p.name}</strong> atualizado`);await saveProductToDB(p);toast('Atualizado','success');}else{const np={id:genId(n),name:n,desc:d,stage:st,sales:sl,ticket:tk,deliveryWeeks:dw,dna:'',delivery:'',economics:'',funnel:'',createdAt:new Date().toISOString().split('T')[0]};products.push(np);await saveProductToDB(np);await addActivity(`<strong>${n}</strong> criado em <strong>${SN[st]}</strong>`);toast('Produto criado!','success');}closeModal();renderAll();}
 function confirmDeleteProduct(id){if(!isAdmin)return;const p=getProduct(id);if(!p)return;document.getElementById('confirm-title').textContent='Excluir Produto';document.getElementById('confirm-msg').textContent=`Excluir "${p.name}"?`;document.getElementById('confirm-action-btn').onclick=()=>{deleteProduct(id);closeConfirm();};document.getElementById('confirmDialog').classList.add('visible');}
 function closeConfirm(){document.getElementById('confirmDialog').classList.remove('visible');}
-function deleteProduct(id){const p=getProduct(id);if(!p)return;const n=p.name;products=products.filter(x=>x.id!==id);addActivity(`<strong>${n}</strong> excluído`);saveData();if(currentProductId===id){currentProductId=null;showView('dashboard');}else renderAll();toast(`${n} excluído`,'info');}
+async function deleteProduct(id){const p=getProduct(id);if(!p)return;const n=p.name;products=products.filter(x=>x.id!==id);await deleteProductFromDB(id);await addActivity(`<strong>${n}</strong> excluído`);if(currentProductId===id){currentProductId=null;showView('dashboard');}else renderAll();toast(`${n} excluído`,'info');}
 function filterProducts(q){q=q.toLowerCase();document.querySelectorAll('#view-fabrica .p-card').forEach(c=>{const n=c.querySelector('.p-card-name').textContent.toLowerCase();const m=c.querySelector('.p-card-meta').textContent.toLowerCase();c.style.display=(n.includes(q)||m.includes(q))?'':'none';});}
 
 // ═══ UTILS ═══
@@ -629,10 +642,11 @@ function closeSidebar(){document.getElementById('sidebar').classList.remove('mob
 function triggerFadeUp(){const o=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.1});document.querySelectorAll('.fade-up:not(.visible)').forEach(e=>o.observe(e));}
 
 // ═══ INIT ═══
-document.addEventListener('DOMContentLoaded',()=>{
-  loadData();
-  // Check if admin session exists
-  if(sessionStorage.getItem('produtobos_admin')==='1') isAdmin=true;
+document.addEventListener('DOMContentLoaded',async()=>{
+  await loadData();
+  // Check if Supabase session still exists
+  const{data:{session}}=await sb.auth.getSession();
+  if(session)isAdmin=true;
   applyMode();
 });
 </script>
