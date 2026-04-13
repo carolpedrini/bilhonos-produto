@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bilhon System | Ecossistema de Produtos</title>
+<meta name="description" content="Ecossistema operacional Bilhon System — Content, RH, Comercial e ADS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep:#0e0d0b;--bg-primary:#131110;--bg-secondary:#1a1814;
+  --bg-card:#1e1b17;--bg-card-hover:#252219;--bg-elevated:#2a261f;--bg-surface:#17150f;
+  --text-primary:#f0ebe3;--text-secondary:#a09890;--text-muted:#6d665e;
+  --gold:#c9a55c;--gold-light:#dbb978;--gold-dark:#a88a42;
+  --gold-glow:rgba(201,165,92,.12);--gold-border:rgba(201,165,92,.18);
+  --accent-green:#5cb870;--accent-red:#c85a5a;--accent-amber:#d4a24e;--accent-blue:#5a8fc8;
+  --font-sans:'Inter',system-ui,-apple-system,sans-serif;
+  --font-serif:'Playfair Display',Georgia,serif;
+  --radius-sm:8px;--radius-md:14px;--radius-lg:20px;--radius-xl:28px;
+
+  /* Product Colors */
+  --clr-content:#A37BF5;
+  --clr-content-bg:rgba(163,123,245,.12);
+  --clr-content-border:rgba(163,123,245,.25);
+
+  --clr-rh:#3DD68C;
+  --clr-rh-bg:rgba(61,214,140,.12);
+  --clr-rh-border:rgba(61,214,140,.25);
+
+  --clr-comercial:#F59E42;
+  --clr-comercial-bg:rgba(245,158,66,.12);
+  --clr-comercial-border:rgba(245,158,66,.25);
+
+  --clr-ads:#E84393;
+  --clr-ads-bg:rgba(232,67,147,.12);
+  --clr-ads-border:rgba(232,67,147,.25);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-sans);background:var(--bg-deep);color:var(--text-secondary);min-height:100vh;overflow-x:hidden;line-height:1.6}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg-deep)}::-webkit-scrollbar-thumb{background:var(--gold-dark);border-radius:3px}
+
+/* ═══ NAV ═══ */
+.nav{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(14,13,11,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);z-index:1000;display:flex;align-items:center}
+.nav-inner{width:100%;max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:12px;font-weight:700;font-size:.95rem;color:var(--text-primary);letter-spacing:.08em;text-decoration:none}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-link{font-size:.82rem;color:var(--text-muted);text-decoration:none;transition:color .25s;font-weight:500}
+.nav-link:hover{color:var(--gold)}
+.nav-badge-internal{padding:3px 10px;border-radius:50px;font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:var(--gold-glow);color:var(--gold);border:1px solid var(--gold-border)}
+
+/* ═══ HERO ═══ */
+.hero{padding:140px 32px 80px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(201,165,92,.06) 0%,transparent 70%);pointer-events:none}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;border-radius:50px;font-size:.72rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);background:var(--gold-glow);border:1px solid var(--gold-border);margin-bottom:28px}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse-dot 2s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hero-title{font-family:var(--font-serif);font-size:clamp(2.2rem,5vw,3.6rem);font-weight:400;color:var(--text-primary);margin-bottom:20px;line-height:1.15;position:relative;z-index:1}
+.hero-title span{color:var(--gold);font-weight:600}
+.hero-subtitle{font-size:1.05rem;color:var(--text-secondary);max-width:560px;margin:0 auto;line-height:1.8;position:relative;z-index:1}
+
+/* ═══ PRODUCTS SECTION ═══ */
+.section{max-width:900px;margin:0 auto;padding:0 32px 100px}
+.section-header{text-align:center;margin-bottom:56px}
+.section-label{font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:block}
+.section-title{font-family:var(--font-serif);font-size:clamp(1.5rem,3vw,2rem);font-weight:400;color:var(--text-primary);margin-bottom:12px}
+.section-desc{font-size:.92rem;color:var(--text-muted);max-width:480px;margin:0 auto}
+
+/* ═══ MASTER PRODUCT ═══ */
+.master-product{position:relative;background:var(--bg-card);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-xl);padding:40px 44px;margin-bottom:20px;overflow:hidden;transition:all .4s}
+.master-product::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light),var(--gold))}
+.master-product::after{content:'';position:absolute;top:0;right:0;width:280px;height:100%;background:linear-gradient(135deg,transparent 30%,rgba(201,165,92,.04) 60%,rgba(201,165,92,.08) 100%);pointer-events:none}
+.master-product:hover{border-color:var(--gold-border);box-shadow:0 8px 48px rgba(201,165,92,.08)}
+.master-top{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.master-logo{width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:14px;background:linear-gradient(135deg,rgba(201,165,92,.15),rgba(201,165,92,.05));border:1px solid var(--gold-border)}
+.master-logo svg{width:28px;height:28px}
+.master-name{font-family:var(--font-serif);font-size:1.65rem;font-weight:600;color:var(--text-primary);letter-spacing:.02em}
+.master-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:50px;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:linear-gradient(135deg,rgba(201,165,92,.2),rgba(201,165,92,.08));color:var(--gold-light);border:1px solid var(--gold-border)}
+.master-desc{font-size:.92rem;color:var(--text-secondary);line-height:1.75;max-width:560px;position:relative;z-index:1}
+.master-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.master-tag{padding:5px 14px;border-radius:6px;font-size:.72rem;font-weight:600;background:rgba(255,255,255,.04);color:var(--text-muted);border:1px solid rgba(255,255,255,.06);transition:all .25s}
+.master-tag:hover{background:rgba(255,255,255,.06);color:var(--text-secondary)}
+
+/* ═══ PRODUCT CARDS ═══ */
+.product-list{display:flex;flex-direction:column;gap:12px}
+.product-card{position:relative;background:var(--bg-card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-lg);padding:28px 32px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:32px;overflow:hidden;transition:all .4s;cursor:pointer}
+.product-card::after{content:'';position:absolute;top:0;right:0;width:200px;height:100%;border-radius:0 var(--radius-lg) var(--radius-lg) 0;pointer-events:none;opacity:.6;transition:opacity .4s}
+.product-card:hover{transform:translateY(-3px);box-shadow:0 8px 40px rgba(0,0,0,.3)}
+.product-card:hover::after{opacity:1}
+
+/* Color variants */
+.product-card.content{border-left:3px solid var(--clr-content)}
+.product-card.content:hover{border-color:var(--clr-content-border);background:linear-gradient(135deg,var(--bg-card) 70%,rgba(163,123,245,.03))}
+.product-card.content::after{background:linear-gradient(90deg,transparent,rgba(163,123,245,.06) 50%,rgba(163,123,245,.12))}
+
+.product-card.rh{border-left:3px solid var(--clr-rh)}
+.product-card.rh:hover{border-color:var(--clr-rh-border);background:linear-gradient(135deg,var(--bg-card) 70%,rgba(61,214,140,.03))}
+.product-card.rh::after{background:linear-gradient(90deg,transparent,rgba(61,214,140,.06) 50%,rgba(61,214,140,.12))}
+
+.product-card.comercial{border-left:3px solid var(--clr-comercial)}
+.product-card.comercial:hover{border-color:var(--clr-comercial-border);background:linear-gradient(135deg,var(--bg-card) 70%,rgba(245,158,66,.03))}
+.product-card.comercial::after{background:linear-gradient(90deg,transparent,rgba(245,158,66,.06) 50%,rgba(245,158,66,.12))}
+
+.product-card.ads{border-left:3px solid var(--clr-ads)}
+.product-card.ads:hover{border-color:var(--clr-ads-border);background:linear-gradient(135deg,var(--bg-card) 70%,rgba(232,67,147,.03))}
+.product-card.ads::after{background:linear-gradient(90deg,transparent,rgba(232,67,147,.06) 50%,rgba(232,67,147,.12))}
+
+.product-info{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.product-header{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+
+/* ═══ PRODUCT LOGO MARK (CX Style) ═══ */
+.product-logo{display:inline-flex;align-items:center;gap:8px;transition:all .35s}
+.product-logo-prefix{font-size:1.4rem;font-weight:900;letter-spacing:-.02em;color:var(--text-primary);line-height:1}
+.product-logo-badge{display:inline-flex;align-items:center;padding:4px 14px;border-radius:6px;font-size:.82rem;font-weight:600;font-style:italic;line-height:1;transition:all .35s}
+.content .product-logo-badge{background:var(--clr-content);color:#fff}
+.rh .product-logo-badge{background:var(--clr-rh);color:#0a1f10}
+.comercial .product-logo-badge{background:var(--clr-comercial);color:#1a1005}
+.ads .product-logo-badge{background:var(--clr-ads);color:#fff}
+.product-card:hover .product-logo{transform:scale(1.05)}
+
+/* Fullname subtitle */
+.product-fullname{font-size:.72rem;font-weight:500;color:var(--text-muted);letter-spacing:.02em;margin-top:-2px}
+
+.product-desc{font-size:.86rem;color:var(--text-secondary);line-height:1.6;max-width:480px}
+.product-systems{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.product-system-pill{padding:3px 10px;border-radius:4px;font-size:.68rem;font-weight:600;background:rgba(255,255,255,.04);color:var(--text-muted);border:1px solid rgba(255,255,255,.04)}
+
+.product-right{display:flex;align-items:center;gap:16px;position:relative;z-index:1}
+.product-arrow{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-muted);transition:all .3s}
+.product-card:hover .product-arrow{background:rgba(255,255,255,.06);color:var(--text-primary);border-color:rgba(255,255,255,.12);transform:translateX(3px)}
+
+/* ═══ ECOSYSTEM VISUAL ═══ */
+.ecosystem-connector{display:flex;align-items:center;justify-content:center;padding:8px 0;position:relative}
+.ecosystem-connector::before{content:'';width:1px;height:24px;background:linear-gradient(180deg,var(--gold-border),rgba(201,165,92,.06))}
+.connector-dot{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--gold);opacity:.3;animation:connector-pulse 2s ease-in-out infinite}
+@keyframes connector-pulse{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+
+/* ═══ CTA ═══ */
+.cta-section{text-align:center;padding:60px 32px 80px}
+.cta-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 36px;border-radius:var(--radius-sm);background:var(--gold);color:var(--bg-deep);font-family:var(--font-sans);font-size:.88rem;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:all .3s;border:none;text-decoration:none}
+.cta-btn:hover{background:var(--gold-light);transform:translateY(-2px);box-shadow:0 8px 32px rgba(201,165,92,.2)}
+.cta-btn svg{width:18px;height:18px}
+.cta-hint{font-size:.78rem;color:var(--text-muted);margin-top:16px}
+
+/* ═══ FOOTER ═══ */
+footer{padding:40px 32px;text-align:center;font-size:.72rem;color:var(--text-muted);border-top:1px solid rgba(255,255,255,.04)}
+footer a{color:var(--gold);text-decoration:none}
+
+/* ═══ ORBITAL ═══ */
+.orbital-section{padding:20px 32px 60px;display:flex;justify-content:center;align-items:center;position:relative;overflow:visible}
+.orbital-wrapper{position:relative;width:420px;height:420px}
+
+/* Core */
+.orbital-core{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;background:radial-gradient(circle,rgba(201,165,92,.25) 0%,rgba(201,165,92,.08) 60%,transparent 100%);display:flex;align-items:center;justify-content:center;z-index:20}
+.orbital-core-inner{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--bg-card),var(--bg-elevated));border:2px solid var(--gold-border);display:flex;align-items:center;justify-content:center;flex-direction:column;box-shadow:0 0 40px rgba(201,165,92,.15)}
+.orbital-core-text{font-size:.7rem;font-weight:800;color:var(--gold);letter-spacing:.06em;line-height:1}
+.orbital-core-sub{font-size:.42rem;font-weight:500;color:var(--text-muted);letter-spacing:.08em;margin-top:2px}
+.orbital-core-pulse{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90px;height:90px;border-radius:50%;border:1px solid rgba(201,165,92,.1);animation:orbital-ping 3s ease-in-out infinite}
+.orbital-core-pulse2{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:110px;height:110px;border-radius:50%;border:1px solid rgba(201,165,92,.06);animation:orbital-ping 3s ease-in-out infinite 1s}
+@keyframes orbital-ping{0%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(1.3);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:.6}}
+
+/* Orbit ring */
+.orbital-ring{position:absolute;top:50%;left:50%;width:320px;height:320px;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(255,255,255,.06)}
+.orbital-ring-inner{position:absolute;top:50%;left:50%;width:200px;height:200px;transform:translate(-50%,-50%);border-radius:50%;border:1px dashed rgba(255,255,255,.04)}
+
+/* Rotating container */
+.orbital-track{position:absolute;top:50%;left:50%;width:0;height:0;animation:orbital-spin 25s linear infinite}
+@keyframes orbital-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* Node */
+.orbital-node{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .3s}
+.orbital-node:hover{transform:scale(1.12)}
+.orbital-node-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid;transition:all .35s;box-shadow:0 0 20px rgba(0,0,0,.3)}
+.orbital-node-dot svg{width:16px;height:16px}
+.orbital-node-label{display:flex;align-items:center;gap:4px;padding:3px 10px;border-radius:5px;font-size:.62rem;font-weight:700;font-style:italic;letter-spacing:.03em;white-space:nowrap;animation:orbital-spin-reverse 25s linear infinite}
+@keyframes orbital-spin-reverse{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+.orbital-node-dot-inner{animation:orbital-spin-reverse 25s linear infinite;display:flex;align-items:center;justify-content:center}
+
+/* Node positions (4 nodes, evenly spaced) */
+.orbital-node.n0{left:-20px;top:-180px}
+.orbital-node.n1{left:140px;top:-20px}
+.orbital-node.n2{left:-20px;top:140px}
+.orbital-node.n3{left:-180px;top:-20px}
+
+/* Color variants */
+.orbital-node.content .orbital-node-dot{background:rgba(163,123,245,.15);border-color:var(--clr-content);color:var(--clr-content)}
+.orbital-node.content .orbital-node-label{background:var(--clr-content);color:#fff}
+.orbital-node.rh .orbital-node-dot{background:rgba(61,214,140,.15);border-color:var(--clr-rh);color:var(--clr-rh)}
+.orbital-node.rh .orbital-node-label{background:var(--clr-rh);color:#0a1f10}
+.orbital-node.comercial .orbital-node-dot{background:rgba(245,158,66,.15);border-color:var(--clr-comercial);color:var(--clr-comercial)}
+.orbital-node.comercial .orbital-node-label{background:var(--clr-comercial);color:#1a1005}
+.orbital-node.ads .orbital-node-dot{background:rgba(232,67,147,.15);border-color:var(--clr-ads);color:var(--clr-ads)}
+.orbital-node.ads .orbital-node-label{background:var(--clr-ads);color:#fff}
+
+/* Connection lines */
+.orbital-line{position:absolute;top:50%;left:50%;width:160px;height:1px;transform-origin:0 0;opacity:.12}
+.orbital-line.l0{transform:rotate(-90deg);background:linear-gradient(90deg,var(--gold),var(--clr-content))}
+.orbital-line.l1{transform:rotate(0deg);background:linear-gradient(90deg,var(--gold),var(--clr-rh))}
+.orbital-line.l2{transform:rotate(90deg);background:linear-gradient(90deg,var(--gold),var(--clr-comercial))}
+.orbital-line.l3{transform:rotate(180deg);background:linear-gradient(90deg,var(--gold),var(--clr-ads))}
+
+/* Detail card popup */
+.orbital-detail{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);opacity:0;width:260px;background:var(--bg-card);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-md);padding:24px 28px;z-index:50;pointer-events:none;transition:all .4s cubic-bezier(.175,.885,.32,1.275);text-align:center;box-shadow:0 12px 48px rgba(0,0,0,.5)}
+.orbital-detail.active{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+.orbital-detail-title{font-family:var(--font-serif);font-size:1.1rem;font-weight:600;color:var(--text-primary);margin-bottom:6px;line-height:1.3}
+.orbital-detail-desc{font-size:.82rem;color:var(--text-secondary);margin-bottom:14px;line-height:1.5}
+.orbital-detail-system{display:inline-flex;align-items:center;gap:6px;padding:5px 16px;border-radius:6px;font-size:.72rem;font-weight:700;letter-spacing:.04em}
+.orbital-detail-system.sys-content{background:var(--clr-content-bg);color:var(--clr-content);border:1px solid var(--clr-content-border)}
+.orbital-detail-system.sys-rh{background:var(--clr-rh-bg);color:var(--clr-rh);border:1px solid var(--clr-rh-border)}
+.orbital-detail-system.sys-comercial{background:var(--clr-comercial-bg);color:var(--clr-comercial);border:1px solid var(--clr-comercial-border)}
+.orbital-detail-system.sys-ads{background:var(--clr-ads-bg);color:var(--clr-ads);border:1px solid var(--clr-ads-border)}
+.orbital-detail-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text-muted);font-size:1rem;cursor:pointer;padding:4px;line-height:1;transition:color .2s}
+.orbital-detail-close:hover{color:var(--text-primary)}
+.orbital-detail-line{position:absolute;top:-1px;left:0;right:0;height:3px;border-radius:var(--radius-md) var(--radius-md) 0 0}
+.orbital-detail-line.dl-content{background:var(--clr-content)}
+.orbital-detail-line.dl-rh{background:var(--clr-rh)}
+.orbital-detail-line.dl-comercial{background:var(--clr-comercial)}
+.orbital-detail-line.dl-ads{background:var(--clr-ads)}
+.orbital-detail-system.sys-core{background:var(--gold-glow);color:var(--gold);border:1px solid var(--gold-border)}
+.orbital-detail-line.dl-core{background:var(--gold)}
+.orbital-core{cursor:pointer}
+
+/* Paused state — freeze everything including counter-rotations */
+.orbital-track.paused{animation-play-state:paused}
+.orbital-track.paused .orbital-node-label,
+.orbital-track.paused .orbital-node-dot-inner{animation-play-state:paused}
+
+/* ═══ ANIMATIONS ═══ */
+.fade-up{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+.stagger-1{transition-delay:.1s}.stagger-2{transition-delay:.2s}.stagger-3{transition-delay:.3s}.stagger-4{transition-delay:.4s}.stagger-5{transition-delay:.5s}
+
+@media(max-width:768px){
+  .hero{padding:120px 20px 60px}
+  .section{padding:0 20px 80px}
+  .master-product{padding:28px 24px}
+  .product-card{grid-template-columns:1fr;padding:24px;gap:16px}
+  .product-right{justify-content:flex-start}
+  .master-tags{gap:6px}
+  .orbital-wrapper{width:320px;height:320px}
+  .orbital-ring{width:240px;height:240px}
+  .orbital-ring-inner{width:150px;height:150px}
+  .orbital-node.n0{left:-20px;top:-140px}
+  .orbital-node.n1{left:100px;top:-20px}
+  .orbital-node.n2{left:-20px;top:100px}
+  .orbital-node.n3{left:-140px;top:-20px}
+  .orbital-line{width:120px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav"><div class="nav-inner">
+  <a class="nav-logo" href="#">
+    <svg width="28" height="20" viewBox="0 0 28 20" fill="none"><path d="M2 18L8 2L14 12L20 2L26 18" stroke="#c9a55c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    BILHON
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="#">Produtos</a>
+    <a class="nav-link" href="#">Dashboard</a>
+    <span class="nav-badge-internal">INTERNO</span>
+  </div>
+</div></nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="fade-up">
+    <div class="hero-eyebrow"><span class="dot"></span> ECOSSISTEMA OPERACIONAL</div>
+    <h1 class="hero-title">
+      <span>Bilhon</span> System
+    </h1>
+    <p class="hero-subtitle">
+      Sistema operacional completo para escalar operações — do conteúdo à gestão de pessoas, do comercial ao tráfego pago.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ ORBITAL ═══ -->
+<section class="orbital-section fade-up">
+  <div class="orbital-wrapper">
+    <!-- Core -->
+    <div class="orbital-core" onclick="showOrbitalDetail(this)" data-product="core">
+      <div class="orbital-core-pulse"></div>
+      <div class="orbital-core-pulse2"></div>
+      <div class="orbital-core-inner">
+        <span class="orbital-core-text">BS</span>
+        <span class="orbital-core-sub">CORE</span>
+      </div>
+    </div>
+    <!-- Ring -->
+    <div class="orbital-ring"></div>
+    <div class="orbital-ring-inner"></div>
+    <!-- Rotating track -->
+    <div class="orbital-track">
+      <!-- Connection lines -->
+      <div class="orbital-line l0"></div>
+      <div class="orbital-line l1"></div>
+      <div class="orbital-line l2"></div>
+      <div class="orbital-line l3"></div>
+      <!-- Nodes -->
+      <div class="orbital-node n0 content" data-product="content" onclick="showOrbitalDetail(this)">
+        <div class="orbital-node-dot"><div class="orbital-node-dot-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5"/><path d="M10 14L20 4"/><path d="M15 4h5v5"/></svg></div></div>
+        <span class="orbital-node-label">Content</span>
+      </div>
+      <div class="orbital-node n1 rh" data-product="rh" onclick="showOrbitalDetail(this)">
+        <div class="orbital-node-dot"><div class="orbital-node-dot-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg></div></div>
+        <span class="orbital-node-label">RH</span>
+      </div>
+      <div class="orbital-node n2 comercial" data-product="comercial" onclick="showOrbitalDetail(this)">
+        <div class="orbital-node-dot"><div class="orbital-node-dot-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div></div>
+        <span class="orbital-node-label">Comercial</span>
+      </div>
+      <div class="orbital-node n3 ads" data-product="ads" onclick="showOrbitalDetail(this)">
+        <div class="orbital-node-dot"><div class="orbital-node-dot-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div></div>
+        <span class="orbital-node-label">ADS</span>
+      </div>
+    </div>
+    <!-- Detail popup -->
+    <div class="orbital-detail" id="orbitalDetail">
+      <div class="orbital-detail-line" id="orbitalDetailLine"></div>
+      <button class="orbital-detail-close" onclick="closeOrbitalDetail()">×</button>
+      <div class="orbital-detail-title" id="orbitalDetailTitle"></div>
+      <div class="orbital-detail-desc" id="orbitalDetailDesc"></div>
+      <span class="orbital-detail-system" id="orbitalDetailSystem"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PRODUCTS ═══ -->
+<section class="section">
+  <div class="section-header fade-up">
+    <span class="section-label">PRODUTOS</span>
+    <h2 class="section-title">Ecossistema Bilhon System</h2>
+    <p class="section-desc">Cada módulo opera de forma independente mas conectada ao sistema central.</p>
+  </div>
+
+  <!-- MASTER PRODUCT -->
+  <div class="master-product fade-up">
+    <div class="master-top">
+      <div class="master-logo">
+        <svg width="28" height="20" viewBox="0 0 28 20" fill="none"><path d="M2 18L8 2L14 12L20 2L26 18" stroke="#c9a55c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="master-name">Bilhon System</div>
+      </div>
+      <div class="master-badge">● CORE</div>
+    </div>
+    <p class="master-desc">
+      Sistema operacional central que orquestra todos os módulos especializados. 
+      Inteligência artificial, automação e governança integradas em um único ecossistema.
+    </p>
+    <div class="master-tags">
+      <span class="master-tag">IA Integrada</span>
+      <span class="master-tag">Multi-Squad</span>
+      <span class="master-tag">Dashboard Central</span>
+      <span class="master-tag">Automação</span>
+    </div>
+  </div>
+
+  <div class="ecosystem-connector"><span class="connector-dot"></span></div>
+
+  <!-- SUB-PRODUCTS -->
+  <div class="product-list">
+
+    <!-- BS Content -->
+    <div class="product-card content fade-up stagger-1">
+      <div class="product-info">
+        <div class="product-header">
+          <div class="product-logo">
+            <span class="product-logo-prefix">BS</span>
+            <span class="product-logo-badge">Content</span>
+          </div>
+        </div>
+        <div class="product-fullname">Bilhon System Content</div>
+        <p class="product-desc">Operação completa de conteúdo — planejamento, produção, distribuição e análise de performance editorial e social.</p>
+        <div class="product-systems">
+          <span class="product-system-pill">Mídia.BOS</span>
+          <span class="product-system-pill">IA Editorial</span>
+          <span class="product-system-pill">Calendário</span>
+        </div>
+      </div>
+      <div class="product-right">
+        <div class="product-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- BS RH -->
+    <div class="product-card rh fade-up stagger-2">
+      <div class="product-info">
+        <div class="product-header">
+          <div class="product-logo">
+            <span class="product-logo-prefix">BS</span>
+            <span class="product-logo-badge">RH</span>
+          </div>
+        </div>
+        <div class="product-fullname">Bilhon System RH</div>
+        <p class="product-desc">Gestão operacional de pessoas — recrutamento, onboarding, performance, cultura e retenção de talentos.</p>
+        <div class="product-systems">
+          <span class="product-system-pill">PEOPLE.BOS</span>
+          <span class="product-system-pill">Playbooks</span>
+          <span class="product-system-pill">Hiring</span>
+        </div>
+      </div>
+      <div class="product-right">
+        <div class="product-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- BS Comercial -->
+    <div class="product-card comercial fade-up stagger-3">
+      <div class="product-info">
+        <div class="product-header">
+          <div class="product-logo">
+            <span class="product-logo-prefix">BS</span>
+            <span class="product-logo-badge">Comercial</span>
+          </div>
+        </div>
+        <div class="product-fullname">Bilhon System Comercial</div>
+        <p class="product-desc">Motor de vendas completo — SDR, closer, pipeline, proposta, negociação e gestão de carteira com IA.</p>
+        <div class="product-systems">
+          <span class="product-system-pill">COMERCIAL.BOS</span>
+          <span class="product-system-pill">SDR Squad</span>
+          <span class="product-system-pill">CRM</span>
+        </div>
+      </div>
+      <div class="product-right">
+        <div class="product-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- BS ADS -->
+    <div class="product-card ads fade-up stagger-4">
+      <div class="product-info">
+        <div class="product-header">
+          <div class="product-logo">
+            <span class="product-logo-prefix">BS</span>
+            <span class="product-logo-badge">ADS</span>
+          </div>
+        </div>
+        <div class="product-fullname">Bilhon System ADS</div>
+        <p class="product-desc">Gestão de tráfego pago — criativos, campanhas, otimização de budget, análise de ROAS e funil de conversão.</p>
+        <div class="product-systems">
+          <span class="product-system-pill">Meta Ads</span>
+          <span class="product-system-pill">Google Ads</span>
+          <span class="product-system-pill">Criativos IA</span>
+        </div>
+      </div>
+      <div class="product-right">
+        <div class="product-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<div class="cta-section fade-up">
+  <a class="cta-btn" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Acessar Dashboard
+  </a>
+  <p class="cta-hint">Gerencie o pipeline de produção de cada módulo</p>
+</div>
+
+<footer>
+  <p>Bilhon · Sistema Operacional Inteligente · <a href="#">Documento interno</a></p>
+</footer>
+
+<script>
+// Fade up animations on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// Orbital detail data
+const orbitalData = {
+  core: {
+    title: 'BS CORE',
+    desc: 'Solução Sob Demanda',
+    system: 'Diagnóstico',
+    sysClass: 'sys-core',
+    lineClass: 'dl-core'
+  },
+  content: {
+    title: 'Bilhon System Content',
+    desc: 'Operação Completa de Conteúdo',
+    system: 'Sistema MÍDIA.BOS',
+    sysClass: 'sys-content',
+    lineClass: 'dl-content'
+  },
+  rh: {
+    title: 'Bilhon System RH',
+    desc: 'Gestão Operacional de Pessoas',
+    system: 'Sistema PEOPLE.BOS',
+    sysClass: 'sys-rh',
+    lineClass: 'dl-rh'
+  },
+  comercial: {
+    title: 'Bilhon System Comercial',
+    desc: 'Motor de Vendas Completo',
+    system: 'Sistema SALES.BOS',
+    sysClass: 'sys-comercial',
+    lineClass: 'dl-comercial'
+  },
+  ads: {
+    title: 'Bilhon System ADS',
+    desc: 'Gestão de Tráfego Pago',
+    system: 'Em breve',
+    sysClass: 'sys-ads',
+    lineClass: 'dl-ads'
+  }
+};
+
+let activeOrbitalProduct = null;
+
+function showOrbitalDetail(node) {
+  const product = node.dataset.product;
+  const data = orbitalData[product];
+  if (!data) return;
+  
+  const detail = document.getElementById('orbitalDetail');
+  const track = document.querySelector('.orbital-track');
+
+  // If clicking the same node, close
+  if (activeOrbitalProduct === product) {
+    closeOrbitalDetail();
+    return;
+  }
+
+  // Pause rotation
+  track.classList.add('paused');
+  activeOrbitalProduct = product;
+
+  // Fill content
+  document.getElementById('orbitalDetailTitle').textContent = data.title;
+  document.getElementById('orbitalDetailDesc').textContent = data.desc;
+  const sysEl = document.getElementById('orbitalDetailSystem');
+  sysEl.textContent = data.system;
+  sysEl.className = 'orbital-detail-system ' + data.sysClass;
+  const lineEl = document.getElementById('orbitalDetailLine');
+  lineEl.className = 'orbital-detail-line ' + data.lineClass;
+
+  // Show
+  detail.classList.add('active');
+}
+
+function closeOrbitalDetail() {
+  const detail = document.getElementById('orbitalDetail');
+  const track = document.querySelector('.orbital-track');
+  detail.classList.remove('active');
+  track.classList.remove('paused');
+  activeOrbitalProduct = null;
+}
+
+// Close on click outside
+document.querySelector('.orbital-section').addEventListener('click', function(e) {
+  if (!e.target.closest('.orbital-node') && !e.target.closest('.orbital-detail') && !e.target.closest('.orbital-core')) {
+    closeOrbitalDetail();
+  }
+});
+</script>
+</body>
+</html>
