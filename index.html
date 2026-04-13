@@ -283,6 +283,33 @@ footer{padding:32px;text-align:center;font-size:.72rem;color:var(--text-muted);b
 @media(max-width:900px){.grid-2,.grid-4{grid-template-columns:1fr}.sidebar{display:none}.sidebar.mobile-open{display:flex;position:fixed;top:var(--nav-h);left:0;bottom:0;z-index:999}.mobile-menu-btn{display:flex!important}.content-section{padding:32px 0}.container{padding:0 16px}.pipeline-grid{grid-template-columns:repeat(2,1fr)}.form-row{grid-template-columns:1fr}.factory-stats{flex-wrap:wrap}}
 @media(max-width:600px){.pipeline-grid{grid-template-columns:1fr}}
 .mobile-menu-btn{display:none;align-items:center;justify-content:center;width:40px;height:40px;background:none;border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);color:var(--gold);cursor:pointer}
+
+/* ═══ FAB + Modal de Ideia ═══ */
+.idea-fab{position:fixed;bottom:28px;right:28px;z-index:900;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#a8893a);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(201,165,92,.35);transition:transform .25s,box-shadow .25s}
+.idea-fab:hover{transform:scale(1.12);box-shadow:0 6px 32px rgba(201,165,92,.5)}
+.idea-fab svg{width:26px;height:26px;fill:none;stroke:#0e0d0b;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.idea-fab-tooltip{position:fixed;bottom:42px;right:92px;background:var(--bg-card);border:1px solid var(--gold-border);border-radius:8px;padding:8px 14px;font-size:.78rem;color:var(--gold);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .25s;z-index:900}
+.idea-fab:hover+.idea-fab-tooltip{opacity:1}
+.idea-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center}
+.idea-overlay.active{display:flex}
+.idea-modal{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:16px;width:90%;max-width:480px;padding:32px;position:relative;animation:ideaFadeIn .35s ease}
+@keyframes ideaFadeIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.idea-modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;transition:color .2s}
+.idea-modal-close:hover{color:var(--gold)}
+.idea-modal h3{color:var(--gold);font-size:1.15rem;margin:0 0 4px;letter-spacing:.04em}
+.idea-modal .idea-subtitle{color:var(--text-muted);font-size:.82rem;margin:0 0 24px}
+.idea-modal label{display:block;color:var(--text-secondary);font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+.idea-modal input,.idea-modal textarea{width:100%;background:var(--bg-elevated);border:1px solid rgba(201,165,92,.15);border-radius:8px;color:var(--text-primary);padding:10px 14px;font-size:.88rem;font-family:inherit;outline:none;transition:border-color .2s;box-sizing:border-box}
+.idea-modal input:focus,.idea-modal textarea:focus{border-color:var(--gold)}
+.idea-modal textarea{min-height:100px;resize:vertical}
+.idea-field{margin-bottom:18px}
+.idea-submit{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--gold),#a8893a);color:#0e0d0b;font-weight:700;font-size:.92rem;cursor:pointer;letter-spacing:.04em;transition:opacity .2s}
+.idea-submit:hover{opacity:.9}
+.idea-submit:disabled{opacity:.5;cursor:wait}
+.idea-success{text-align:center;padding:24px 0}
+.idea-success svg{width:48px;height:48px;stroke:var(--gold);fill:none;stroke-width:1.5;margin-bottom:12px}
+.idea-success h3{color:var(--gold);margin:0 0 8px}
+.idea-success p{color:var(--text-muted);font-size:.88rem;margin:0}
 </style>
 </head>
 <body class="viewer">
@@ -457,6 +484,41 @@ footer{padding:32px;text-align:center;font-size:.72rem;color:var(--text-muted);b
 <!-- CONFIRM -->
 <div class="confirm-overlay" id="confirmDialog"><div class="confirm-box"><h3 id="confirm-title">Confirmar</h3><p id="confirm-msg">Tem certeza?</p><div class="confirm-actions"><button class="btn btn-secondary" onclick="closeConfirm()">Cancelar</button><button class="btn btn-danger" id="confirm-action-btn">Excluir</button></div></div></div>
 <div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══ FAB IDEIA ═══ -->
+<button class="idea-fab" onclick="openIdeaModal()" title="Cadastrar ideia de produto">
+  <svg viewBox="0 0 24 24"><path d="M9 21h6M12 3a6 6 0 0 1 4 10.5V17a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-3.5A6 6 0 0 1 12 3z"/></svg>
+</button>
+<div class="idea-fab-tooltip">💡 Sugerir ideia de produto</div>
+
+<!-- ═══ MODAL IDEIA ═══ -->
+<div class="idea-overlay" id="ideaOverlay">
+  <div class="idea-modal" id="ideaModal">
+    <button class="idea-modal-close" onclick="closeIdeaModal()">&times;</button>
+    <div id="ideaFormContent">
+      <h3>💡 Cadastrar Ideia de Produto</h3>
+      <p class="idea-subtitle">Sua ideia vai direto para a Encubadora do pipeline!</p>
+      <div class="idea-field">
+        <label>Seu nome</label>
+        <input type="text" id="ideaName" placeholder="Ex: Carolina Pedrini">
+      </div>
+      <div class="idea-field">
+        <label>Sua ideia em uma frase</label>
+        <input type="text" id="ideaOneLiner" placeholder="Ex: Sistema de automação de relatórios">
+      </div>
+      <div class="idea-field">
+        <label>Detalhe um pouco mais</label>
+        <textarea id="ideaDetails" placeholder="Descreva a ideia, coloque links de referência, se quiser..."></textarea>
+      </div>
+      <button class="idea-submit" id="ideaSubmitBtn" onclick="submitIdea()">Enviar para Encubadora</button>
+    </div>
+    <div id="ideaSuccess" class="idea-success" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <h3>Ideia enviada para a Encubadora!</h3>
+      <p>Obrigado pela contribuição.<br>Sua ideia já aparece no pipeline.</p>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -640,6 +702,52 @@ function toast(m,t='info'){const c=document.getElementById('toastContainer');con
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('mobile-open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('mobile-open');}
 function triggerFadeUp(){const o=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.1});document.querySelectorAll('.fade-up:not(.visible)').forEach(e=>o.observe(e));}
+
+// ═══ IDEA MODAL (Encubadora) ═══
+function openIdeaModal() {
+  document.getElementById('ideaOverlay').classList.add('active');
+  document.getElementById('ideaFormContent').style.display = 'block';
+  document.getElementById('ideaSuccess').style.display = 'none';
+  document.getElementById('ideaSubmitBtn').disabled = false;
+  document.getElementById('ideaSubmitBtn').textContent = 'Enviar para Encubadora';
+  document.getElementById('ideaName').value = '';
+  document.getElementById('ideaOneLiner').value = '';
+  document.getElementById('ideaDetails').value = '';
+}
+function closeIdeaModal() {
+  document.getElementById('ideaOverlay').classList.remove('active');
+}
+document.addEventListener('click', function(e) {
+  const overlay = document.getElementById('ideaOverlay');
+  if (e.target === overlay) closeIdeaModal();
+});
+async function submitIdea() {
+  const name = document.getElementById('ideaName').value.trim();
+  const oneLiner = document.getElementById('ideaOneLiner').value.trim();
+  const details = document.getElementById('ideaDetails').value.trim();
+  if (!name || !oneLiner) { alert('Preencha seu nome e a ideia em uma frase.'); return; }
+  const btn = document.getElementById('ideaSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  try {
+    const productName = oneLiner;
+    const desc = `[Ideia de ${name}] ${details || oneLiner}`;
+    const id = genId(productName);
+    const p = {id, name: productName, desc, stage: 1, sales: 0, ticket: '', deliveryWeeks: '', dna: '', delivery: '', economics: '', funnel: ''};
+    products.push(p);
+    await saveProductToDB(p);
+    await addActivity(`💡 Nova ideia de ${name}: "${oneLiner}" → Encubadora`);
+    renderAll();
+    document.getElementById('ideaFormContent').style.display = 'none';
+    document.getElementById('ideaSuccess').style.display = 'block';
+    setTimeout(closeIdeaModal, 3000);
+  } catch(err) {
+    btn.disabled = false;
+    btn.textContent = 'Enviar para Encubadora';
+    alert('Erro ao enviar. Tente novamente.');
+    console.error(err);
+  }
+}
 
 // ═══ INIT ═══
 document.addEventListener('DOMContentLoaded',async()=>{

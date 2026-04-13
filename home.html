@@ -248,31 +248,6 @@ footer a{color:var(--gold);text-decoration:none}
   .orbital-node.n3{left:-140px;top:-20px}
   .orbital-line{width:120px}
 }
-
-/* ═══ FAB + Modal de Ideia ═══ */
-.idea-fab{position:fixed;bottom:28px;right:28px;z-index:900;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#a8893a);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(201,165,92,.35);transition:transform .25s,box-shadow .25s}
-.idea-fab:hover{transform:scale(1.12);box-shadow:0 6px 32px rgba(201,165,92,.5)}
-.idea-fab svg{width:26px;height:26px;fill:none;stroke:#0e0d0b;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-.idea-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center}
-.idea-overlay.active{display:flex}
-.idea-modal{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:16px;width:90%;max-width:480px;padding:32px;position:relative;animation:fadeInUp .35s ease}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-.idea-modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;transition:color .2s}
-.idea-modal-close:hover{color:var(--gold)}
-.idea-modal h3{color:var(--gold);font-size:1.15rem;margin:0 0 4px;letter-spacing:.04em}
-.idea-modal .idea-subtitle{color:var(--text-muted);font-size:.82rem;margin:0 0 24px}
-.idea-modal label{display:block;color:var(--text-secondary);font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
-.idea-modal input,.idea-modal textarea{width:100%;background:var(--bg-elevated);border:1px solid rgba(201,165,92,.15);border-radius:8px;color:var(--text-primary);padding:10px 14px;font-size:.88rem;font-family:inherit;outline:none;transition:border-color .2s;box-sizing:border-box}
-.idea-modal input:focus,.idea-modal textarea:focus{border-color:var(--gold)}
-.idea-modal textarea{min-height:100px;resize:vertical}
-.idea-field{margin-bottom:18px}
-.idea-submit{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--gold),#a8893a);color:#0e0d0b;font-weight:700;font-size:.92rem;cursor:pointer;letter-spacing:.04em;transition:opacity .2s}
-.idea-submit:hover{opacity:.9}
-.idea-success{text-align:center;padding:24px 0}
-.idea-success svg{width:48px;height:48px;stroke:var(--gold);fill:none;stroke-width:1.5;margin-bottom:12px}
-.idea-success h3{color:var(--gold);margin:0 0 8px}
-.idea-success p{color:var(--text-muted);font-size:.88rem;margin:0}
 </style>
 </head>
 <body>
@@ -497,40 +472,6 @@ footer a{color:var(--gold);text-decoration:none}
   <p class="cta-hint">Gerencie o pipeline de produção de cada módulo</p>
 </div>
 
-<!-- ═══ FAB IDEIA ═══ -->
-<button class="idea-fab" onclick="openIdeaModal()" title="Cadastrar ideia de produto">
-  <svg viewBox="0 0 24 24"><path d="M9 21h6M12 3a6 6 0 0 1 4 10.5V17a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-3.5A6 6 0 0 1 12 3z"/></svg>
-</button>
-
-<!-- ═══ MODAL IDEIA ═══ -->
-<div class="idea-overlay" id="ideaOverlay">
-  <div class="idea-modal" id="ideaModal">
-    <button class="idea-modal-close" onclick="closeIdeaModal()">&times;</button>
-    <div id="ideaFormContent">
-      <h3>💡 Cadastrar Ideia de Produto</h3>
-      <p class="idea-subtitle">Tem uma ideia para o ecossistema Bilhon? Conta pra gente!</p>
-      <div class="idea-field">
-        <label>Seu nome</label>
-        <input type="text" id="ideaName" placeholder="Ex: Carolina Pedrini">
-      </div>
-      <div class="idea-field">
-        <label>Sua ideia em uma frase</label>
-        <input type="text" id="ideaOneLiner" placeholder="Ex: Sistema de automação de relatórios">
-      </div>
-      <div class="idea-field">
-        <label>Detalhe um pouco mais</label>
-        <textarea id="ideaDetails" placeholder="Descreva a ideia, coloque links de referência, se quiser..."></textarea>
-      </div>
-      <button class="idea-submit" onclick="submitIdea()">Enviar Ideia</button>
-    </div>
-    <div id="ideaSuccess" class="idea-success" style="display:none">
-      <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-      <h3>Ideia registrada!</h3>
-      <p>Obrigado pela contribuição. <br>Vamos analisar e entrar em contato.</p>
-    </div>
-  </div>
-</div>
-
 <footer>
   <p>Bilhon · Sistema Operacional Inteligente · <a href="#">Documento interno</a></p>
 </footer>
@@ -632,32 +573,6 @@ document.querySelector('.orbital-section').addEventListener('click', function(e)
     closeOrbitalDetail();
   }
 });
-// ═══ Idea Modal ═══
-function openIdeaModal() {
-  document.getElementById('ideaOverlay').classList.add('active');
-  document.getElementById('ideaFormContent').style.display = 'block';
-  document.getElementById('ideaSuccess').style.display = 'none';
-  document.getElementById('ideaName').value = '';
-  document.getElementById('ideaOneLiner').value = '';
-  document.getElementById('ideaDetails').value = '';
-}
-function closeIdeaModal() {
-  document.getElementById('ideaOverlay').classList.remove('active');
-}
-// Close on overlay click
-document.getElementById('ideaOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closeIdeaModal();
-});
-function submitIdea() {
-  const name = document.getElementById('ideaName').value.trim();
-  const oneLiner = document.getElementById('ideaOneLiner').value.trim();
-  if (!name || !oneLiner) { alert('Preencha seu nome e a ideia em uma frase.'); return; }
-  // Show success
-  document.getElementById('ideaFormContent').style.display = 'none';
-  document.getElementById('ideaSuccess').style.display = 'block';
-  // Auto-close after 3s
-  setTimeout(closeIdeaModal, 3000);
-}
 </script>
 </body>
 </html>
