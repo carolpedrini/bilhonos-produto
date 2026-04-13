@@ -753,7 +753,7 @@ function filterProducts(q){q=q.toLowerCase();document.querySelectorAll('#view-fa
 function toast(m,t='info'){const c=document.getElementById('toastContainer');const e=document.createElement('div');e.className='toast '+t;e.innerHTML=m;c.appendChild(e);setTimeout(()=>{e.style.opacity='0';e.style.transform='translateY(16px)';e.style.transition='all .3s';setTimeout(()=>e.remove(),300);},2500);}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('mobile-open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('mobile-open');}
-function triggerFadeUp(){const root=document.getElementById('mainContent');const o=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.1,root:root});document.querySelectorAll('.fade-up:not(.visible)').forEach(e=>o.observe(e));}
+function triggerFadeUp(){const active=document.querySelector('.page-view.active');if(active)active.querySelectorAll('.fade-up:not(.visible)').forEach(e=>e.classList.add('visible'));const root=document.getElementById('mainContent');const o=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.1,root:root});document.querySelectorAll('.fade-up:not(.visible)').forEach(e=>o.observe(e));}
 
 // ═══ IDEA MODAL (Inbox) ═══
 function openIdeaModal() {
