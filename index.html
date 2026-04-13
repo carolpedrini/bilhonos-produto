@@ -826,6 +826,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const{data:{session}}=await sb.auth.getSession();
   if(session)isAdmin=true;
   applyMode();
+  setTimeout(()=>{document.querySelectorAll('.page-view.active .fade-up').forEach(e=>e.classList.add('visible'));},200);
 });
 </script>
 </body>
