@@ -61,7 +61,7 @@ body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-
 
 /* ═══ LAYOUT ═══ */
 .app-layout{display:flex;padding-top:var(--nav-h);min-height:100vh}
-.sidebar{width:var(--sidebar-w-collapsed);min-width:var(--sidebar-w-collapsed);background:var(--bg-deep);border-right:1px solid rgba(255,255,255,.06);height:calc(100vh - var(--nav-h));position:fixed;top:var(--nav-h);left:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;z-index:100;transition:width .3s cubic-bezier(.4,0,.2,1),min-width .3s cubic-bezier(.4,0,.2,1),box-shadow .3s ease}
+.sidebar{width:var(--sidebar-w-collapsed);min-width:var(--sidebar-w-collapsed);background:var(--bg-deep);border-right:1px solid rgba(255,255,255,.06);height:calc(100vh - var(--nav-h));position:fixed;top:var(--nav-h);left:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;z-index:100;transition:width .3s cubic-bezier(.4,0,.2,1),min-width .3s cubic-bezier(.4,0,.2,1),box-shadow .3s ease,clip-path .3s cubic-bezier(.4,0,.2,1);clip-path:inset(0 0 0 0)}
 .sidebar:hover{width:var(--sidebar-w);min-width:var(--sidebar-w);box-shadow:8px 0 32px rgba(0,0,0,.4)}
 .sidebar-spacer{width:var(--sidebar-w-collapsed);min-width:var(--sidebar-w-collapsed);flex-shrink:0}
 .sidebar-header{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap;overflow:hidden}
@@ -73,7 +73,7 @@ body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-
 .sidebar-section-label{padding:16px 20px 8px;font-size:.65rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between;white-space:nowrap;overflow:hidden;transition:opacity .2s}
 .sidebar:not(:hover) .sidebar-section-label{opacity:0;height:0;padding:0;margin:0;pointer-events:none}
 .sidebar-item{display:flex;align-items:center;gap:12px;padding:10px 20px;font-size:.82rem;color:var(--text-secondary);cursor:pointer;transition:all .25s;border-left:3px solid transparent;position:relative;white-space:nowrap;overflow:hidden}
-.sidebar:not(:hover) .sidebar-item{justify-content:center;padding:12px 0;border-left-color:transparent;gap:0}
+.sidebar:not(:hover) .sidebar-item{justify-content:center;padding:12px 0;border-left-color:transparent;gap:0;font-size:0}
 .sidebar:not(:hover) .sidebar-item.active{background:rgba(201,165,92,.06)}
 .sidebar-item:hover{background:rgba(201,165,92,.04);color:var(--text-primary)}
 .sidebar-item.active{background:rgba(201,165,92,.06);color:var(--gold-light);border-left-color:var(--gold)}
