@@ -335,6 +335,45 @@ footer{padding:32px;text-align:center;font-size:.72rem;color:var(--text-muted);b
 .inbox-empty h3{font-family:var(--font-serif);color:var(--text-primary);margin:0 0 8px}
 .inbox-empty p{font-size:.85rem;margin:0}
 .inbox-count-badge{background:var(--gold);color:#0e0d0b;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto}
+
+/* ═══ CLIENT PIPELINE ═══ */
+.client-pipeline{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
+.client-col{display:flex;flex-direction:column}
+.client-stage-header{padding:18px 16px;border-radius:var(--radius-md) var(--radius-md) 0 0;background:var(--bg-card);border:1px solid rgba(255,255,255,.06);border-bottom:none;text-align:center;position:relative;overflow:hidden}
+.client-stage-header::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius-md) var(--radius-md) 0 0}
+.client-stage-header[data-cs="1"]::before{background:linear-gradient(90deg,transparent,var(--accent-amber),transparent)}
+.client-stage-header[data-cs="2"]::before{background:linear-gradient(90deg,transparent,var(--accent-green),transparent)}
+.client-stage-header[data-cs="3"]::before{background:linear-gradient(90deg,transparent,var(--accent-red),transparent)}
+.client-stage-icon{width:36px;height:36px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);transition:all .4s}
+.client-stage-header[data-cs="1"] .client-stage-icon{color:var(--accent-amber)}
+.client-stage-header[data-cs="2"] .client-stage-icon{color:var(--accent-green)}
+.client-stage-header[data-cs="3"] .client-stage-icon{color:var(--accent-red)}
+.client-stage-name{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-primary)}
+.client-stage-count{margin-top:8px;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:.7rem;font-weight:700}
+.client-stage-count[data-cs="1"]{background:rgba(212,162,78,.15);color:var(--accent-amber)}
+.client-stage-count[data-cs="2"]{background:rgba(92,184,112,.15);color:var(--accent-green)}
+.client-stage-count[data-cs="3"]{background:rgba(200,90,90,.15);color:var(--accent-red)}
+.client-stage-body{flex:1;min-height:120px;padding:8px;background:var(--bg-card);border:1px solid rgba(255,255,255,.06);border-top:1px dashed rgba(255,255,255,.04);border-radius:0 0 var(--radius-md) var(--radius-md);display:flex;flex-direction:column;gap:6px;transition:all .35s}
+.client-stage-body.drag-over{border-color:var(--gold);background:rgba(201,165,92,.03)}
+.client-card{background:var(--bg-surface);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius-sm);padding:14px;transition:all .3s;cursor:pointer;position:relative}
+.client-card:hover{background:var(--bg-card-hover);border-color:var(--gold-border);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.client-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;border-radius:3px 0 0 3px}
+.client-card[data-cs="1"]::before{background:var(--accent-amber)}
+.client-card[data-cs="2"]::before{background:var(--accent-green)}
+.client-card[data-cs="3"]::before{background:var(--accent-red)}
+.client-card-name{font-size:.85rem;font-weight:600;color:var(--text-primary);margin-bottom:4px}
+.client-card-link{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;color:var(--gold);text-decoration:none;transition:color .2s;margin-top:4px}
+.client-card-link:hover{color:var(--gold-light)}
+.client-card-link svg{width:12px;height:12px}
+.client-card-notes{font-size:.75rem;color:var(--text-muted);margin-top:6px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.client-detail-overlay{position:fixed;inset:0;z-index:1500;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+.client-detail-overlay.visible{display:flex}
+.client-detail-modal{background:var(--bg-card);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);width:90%;max-width:560px;max-height:85vh;overflow-y:auto;box-shadow:0 16px 64px rgba(0,0,0,.5);animation:ideaFadeIn .35s ease}
+.client-detail-header{padding:28px 32px 0;display:flex;align-items:flex-start;justify-content:space-between}
+.client-detail-header h2{font-family:var(--font-serif);font-size:1.4rem;color:var(--text-primary);font-weight:500}
+.client-detail-body{padding:24px 32px 32px}
+.client-stage-select{margin-top:16px}
+@media(max-width:900px){.client-pipeline{grid-template-columns:1fr}}
 </style>
 </head>
 <body class="viewer">
@@ -374,6 +413,7 @@ footer{padding:32px;text-align:center;font-size:.72rem;color:var(--text-muted);b
       <div class="sidebar-item" data-view="inbox" onclick="showView('inbox')" style="display:none" id="sidebar-inbox-item"><span class="item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></span>Inbox<span class="inbox-count-badge" id="sidebar-inbox-count" style="display:none">0</span></div>
       <div class="sidebar-item" data-view="fabrica" onclick="showView('fabrica')"><span class="item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20V8l4-6h12l4 6v12H2z"/><path d="M2 8h20"/><path d="M12 8v12"/></svg></span>Fábrica<span class="item-count" id="sidebar-fabrica-count">0</span></div>
       <div class="sidebar-item" data-view="arsenal" onclick="showView('arsenal')"><span class="item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>Arsenal<span class="item-count" id="sidebar-arsenal-count">0</span></div>
+      <div class="sidebar-item admin-only" data-view="clientes" onclick="showView('clientes')" id="sidebar-clientes-item"><span class="item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span>Clientes<span class="item-count" id="sidebar-clientes-count">0</span></div>
       <div class="sidebar-section-label">PRODUTOS <button class="btn-add btn-sm admin-only" onclick="openNewProductModal()" style="padding:4px 10px;font-size:.65rem">+ NOVO</button></div>
       <div id="sidebar-products"></div>
     </div>
@@ -443,6 +483,17 @@ footer{padding:32px;text-align:center;font-size:.72rem;color:var(--text-muted);b
       </div></section>
     </div>
 
+    <!-- CLIENTES PIPELINE (admin-only) -->
+    <div class="page-view" id="view-clientes">
+      <section class="content-section"><div class="container fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:8px">
+          <div><span class="section-label">COMERCIAL</span><h2 class="section-title" style="margin-bottom:4px">Pipeline de Clientes</h2><p class="section-subtitle" style="margin-bottom:0">Gestão do funil comercial do Bilhon System.</p></div>
+          <button class="btn-add" onclick="openNewClientModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novo Cliente</button>
+        </div>
+        <div id="client-pipeline"></div>
+      </div></section>
+    </div>
+
     <!-- PRODUCT PANEL -->
     <div class="page-view" id="view-product">
       <section class="content-section"><div class="container">
@@ -508,6 +559,41 @@ footer{padding:32px;text-align:center;font-size:.72rem;color:var(--text-muted);b
   </div>
 </div></div>
 
+<!-- CLIENT MODAL -->
+<div class="modal-overlay" id="clientModal"><div class="modal">
+  <div class="modal-header"><h2 id="client-modal-title">Novo Cliente</h2><button class="modal-close" onclick="closeClientModal()">×</button></div>
+  <div class="modal-body">
+    <input type="hidden" id="client-modal-id">
+    <div class="form-group"><label class="form-label">Nome do Cliente / Empresa</label><input class="form-input" id="client-modal-name" placeholder="Ex: Passeios & Co."></div>
+    <div class="form-group"><label class="form-label">Link (Portal / Diagnóstico)</label><input class="form-input" id="client-modal-link" placeholder="https://..."></div>
+    <div class="form-group"><label class="form-label">Etapa</label><select class="form-select" id="client-modal-stage"><option value="1">Em Análise</option><option value="2">Vendido</option><option value="3">Descartado</option></select></div>
+    <div class="form-group"><label class="form-label">Anotações</label><textarea class="form-textarea" id="client-modal-notes" placeholder="Contexto, próximos passos, observações..." style="min-height:120px"></textarea></div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px"><button class="btn btn-secondary" onclick="closeClientModal()">Cancelar</button><button class="btn btn-primary" id="client-modal-save-btn" onclick="saveClient()">Criar Cliente</button></div>
+  </div>
+</div></div>
+
+<!-- CLIENT DETAIL -->
+<div class="client-detail-overlay" id="clientDetailOverlay" onclick="if(event.target===this)closeClientDetail()">
+  <div class="client-detail-modal">
+    <div class="client-detail-header"><h2 id="cd-name"></h2><button class="modal-close" onclick="closeClientDetail()">×</button></div>
+    <div class="client-detail-body">
+      <div id="cd-link-wrap" style="margin-bottom:20px"></div>
+      <div class="client-stage-select" style="margin-bottom:20px">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="cd-stage" onchange="updateClientStage()"><option value="1">Em Análise</option><option value="2">Vendido</option><option value="3">Descartado</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Anotações</label>
+        <textarea class="form-textarea" id="cd-notes" style="min-height:160px" placeholder="Anotações sobre o cliente..." onchange="updateClientNotes()"></textarea>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:12px">
+        <button class="btn btn-danger btn-sm" onclick="deleteClient()">Excluir</button>
+        <button class="btn btn-secondary btn-sm" onclick="openEditClient()">✎ Editar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM -->
 <div class="confirm-overlay" id="confirmDialog"><div class="confirm-box"><h3 id="confirm-title">Confirmar</h3><p id="confirm-msg">Tem certeza?</p><div class="confirm-actions"><button class="btn btn-secondary" onclick="closeConfirm()">Cancelar</button><button class="btn btn-danger" id="confirm-action-btn">Excluir</button></div></div></div>
 <div class="toast-container" id="toastContainer"></div>
@@ -567,8 +653,15 @@ const STAGE_ICONS=[
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><path d="M8 7h8M8 11h6"/></svg>'
 ];
 
-let products=[],activityLog=[],inboxItems=[],currentProductId=null,ctxProductId=null,draggedProductId=null;
+let products=[],activityLog=[],inboxItems=[],clients=[],currentProductId=null,ctxProductId=null,draggedProductId=null,currentClientId=null;
 let isAdmin=false;
+const CSN=['','Em Análise','Vendido','Descartado'];
+const CS_ICONS=[
+  '',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+];
 
 // ═══ AUTH (Supabase Auth) ═══
 function openLogin(){document.getElementById('loginOverlay').classList.add('visible');document.getElementById('loginPassword').focus();document.getElementById('loginError').classList.remove('visible');}
@@ -597,6 +690,11 @@ async function loadData(){
   const{data:acts}=await sb.from('activity_log').select('*').order('created_at',{ascending:false}).limit(50);
   activityLog=(acts||[]).map(a=>({text:a.text,time:new Date(a.created_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}));
   await loadInbox();
+  await loadClients();
+}
+async function loadClients(){
+  const{data}=await sb.from('clients').select('*').order('created_at',{ascending:true});
+  clients=(data||[]).map(r=>({id:r.id,name:r.name,stage:r.stage,notes:r.notes||'',link:r.link||'',createdAt:r.created_at}));
 }
 async function loadInbox(){
   const{data}=await sb.from('idea_inbox').select('*').eq('status','pending').order('created_at',{ascending:false});
@@ -615,7 +713,7 @@ function getProduct(id){return products.find(p=>p.id===id);}
 function genId(n){return n.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'')+'-'+Date.now().toString(36);}
 
 // ═══ RENDER ═══
-function renderAll(){renderSidebar();renderDashboard();renderFabrica();renderArsenal();renderMetricas();renderInbox();if(currentProductId)renderProductPanel(currentProductId);setTimeout(triggerFadeUp,100);}
+function renderAll(){renderSidebar();renderDashboard();renderFabrica();renderArsenal();renderMetricas();renderInbox();renderClientes();if(currentProductId)renderProductPanel(currentProductId);setTimeout(triggerFadeUp,100);}
 
 function renderSidebar(){
   document.getElementById('sidebar-products').innerHTML=products.map(p=>`<div class="sidebar-item ${currentProductId===p.id?'active':''}" data-product="${p.id}" onclick="showProduct('${p.id}')"><span class="stage-dot stage-${p.stage}"></span><span>${p.name}</span></div>`).join('');
@@ -625,6 +723,9 @@ function renderSidebar(){
   const inboxItem=document.getElementById('sidebar-inbox-item');
   const inboxBadge=document.getElementById('sidebar-inbox-count');
   if(isAdmin){inboxItem.style.display='';inboxBadge.textContent=inboxItems.length;inboxBadge.style.display=inboxItems.length?'':'none';}else{inboxItem.style.display='none';}
+  // Clientes count
+  const clientesCount=document.getElementById('sidebar-clientes-count');
+  if(clientesCount)clientesCount.textContent=clients.length;
 }
 
 function renderInbox(){
@@ -751,6 +852,147 @@ function confirmDeleteProduct(id){if(!isAdmin)return;const p=getProduct(id);if(!
 function closeConfirm(){document.getElementById('confirmDialog').classList.remove('visible');}
 async function deleteProduct(id){const p=getProduct(id);if(!p)return;const n=p.name;products=products.filter(x=>x.id!==id);await deleteProductFromDB(id);await addActivity(`<strong>${n}</strong> excluído`);if(currentProductId===id){currentProductId=null;showView('dashboard');}else renderAll();toast(`${n} excluído`,'info');}
 function filterProducts(q){q=q.toLowerCase();document.querySelectorAll('#view-fabrica .p-card').forEach(c=>{const n=c.querySelector('.p-card-name').textContent.toLowerCase();const m=c.querySelector('.p-card-meta').textContent.toLowerCase();c.style.display=(n.includes(q)||m.includes(q))?'':'none';});}
+
+// ═══ CLIENT PIPELINE ═══
+function renderClientes(){
+  const wrap=document.getElementById('client-pipeline');
+  if(!wrap)return;
+  let h='<div class="client-pipeline">';
+  for(let s=1;s<=3;s++){
+    const items=clients.filter(c=>c.stage===s);
+    h+=`<div class="client-col">
+      <div class="client-stage-header" data-cs="${s}">
+        <div class="client-stage-icon">${CS_ICONS[s]}</div>
+        <div class="client-stage-name">${CSN[s]}</div>
+        <div class="client-stage-count" data-cs="${s}">${items.length}</div>
+      </div>
+      <div class="client-stage-body" data-cs="${s}"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="dropClient(event,${s});this.classList.remove('drag-over')">`;
+    if(!items.length){
+      h+=`<div class="stage-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="24" height="24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg><span>Vazio</span></div>`;
+    } else {
+      items.forEach(c=>{
+        const linkHtml=c.link?`<a class="client-card-link" href="${c.link}" target="_blank" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>🔗 Acessar portal</a>`:'';
+        const notesHtml=c.notes?`<div class="client-card-notes">${c.notes}</div>`:'';
+        h+=`<div class="client-card" data-cs="${s}" data-client-id="${c.id}" draggable="true" onclick="openClientDetail('${c.id}')" ondragstart="dragClientStart(event,'${c.id}')">
+          <div class="client-card-name">${c.name}</div>
+          ${linkHtml}${notesHtml}
+        </div>`;
+      });
+    }
+    h+='</div></div>';
+  }
+  h+='</div>';
+  wrap.innerHTML=h;
+}
+
+function dragClientStart(e,id){e.dataTransfer.setData('text/plain',id);}
+async function dropClient(e,newStage){
+  e.preventDefault();
+  const id=e.dataTransfer.getData('text/plain');
+  const c=clients.find(x=>x.id===id);
+  if(!c||c.stage===newStage)return;
+  c.stage=newStage;
+  await sb.from('clients').update({stage:newStage,updated_at:new Date().toISOString()}).eq('id',id);
+  await addActivity(`<strong>${c.name}</strong> movido para <strong>${CSN[newStage]}</strong>`);
+  renderAll();
+  toast(`${c.name} → ${CSN[newStage]}`,'success');
+}
+
+function openNewClientModal(){
+  document.getElementById('client-modal-title').textContent='Novo Cliente';
+  document.getElementById('client-modal-save-btn').textContent='Criar Cliente';
+  document.getElementById('client-modal-id').value='';
+  document.getElementById('client-modal-name').value='';
+  document.getElementById('client-modal-link').value='';
+  document.getElementById('client-modal-stage').value='1';
+  document.getElementById('client-modal-notes').value='';
+  document.getElementById('clientModal').classList.add('visible');
+  document.getElementById('client-modal-name').focus();
+}
+function openEditClientModal(id){
+  const c=clients.find(x=>x.id===id);
+  if(!c)return;
+  document.getElementById('client-modal-title').textContent='Editar Cliente';
+  document.getElementById('client-modal-save-btn').textContent='Salvar';
+  document.getElementById('client-modal-id').value=c.id;
+  document.getElementById('client-modal-name').value=c.name;
+  document.getElementById('client-modal-link').value=c.link||'';
+  document.getElementById('client-modal-stage').value=c.stage;
+  document.getElementById('client-modal-notes').value=c.notes||'';
+  document.getElementById('clientModal').classList.add('visible');
+}
+function closeClientModal(){document.getElementById('clientModal').classList.remove('visible');}
+async function saveClient(){
+  const id=document.getElementById('client-modal-id').value;
+  const name=document.getElementById('client-modal-name').value.trim();
+  const link=document.getElementById('client-modal-link').value.trim();
+  const stage=parseInt(document.getElementById('client-modal-stage').value);
+  const notes=document.getElementById('client-modal-notes').value.trim();
+  if(!name){toast('Nome obrigatório','warning');return;}
+  if(id){
+    const c=clients.find(x=>x.id===id);
+    if(c){c.name=name;c.link=link;c.stage=stage;c.notes=notes;}
+    await sb.from('clients').update({name,link,stage,notes,updated_at:new Date().toISOString()}).eq('id',id);
+    toast('Cliente atualizado','success');
+  } else {
+    const{data}=await sb.from('clients').insert({name,link,stage,notes}).select().single();
+    if(data)clients.push({id:data.id,name,stage,notes,link,createdAt:data.created_at});
+    await addActivity(`<strong>${name}</strong> adicionado ao pipeline comercial`);
+    toast('Cliente criado!','success');
+  }
+  closeClientModal();
+  renderAll();
+}
+
+function openClientDetail(id){
+  const c=clients.find(x=>x.id===id);
+  if(!c)return;
+  currentClientId=id;
+  document.getElementById('cd-name').textContent=c.name;
+  document.getElementById('cd-stage').value=c.stage;
+  document.getElementById('cd-notes').value=c.notes||'';
+  const linkWrap=document.getElementById('cd-link-wrap');
+  if(c.link){
+    linkWrap.innerHTML=`<a href="${c.link}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(201,165,92,.08);border:1px solid var(--gold-border);border-radius:var(--radius-sm);color:var(--gold);text-decoration:none;font-size:.85rem;font-weight:600;transition:all .25s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>🔗 Acessar Portal</a>`;
+  } else { linkWrap.innerHTML=''; }
+  document.getElementById('clientDetailOverlay').classList.add('visible');
+}
+function closeClientDetail(){document.getElementById('clientDetailOverlay').classList.remove('visible');currentClientId=null;}
+async function updateClientStage(){
+  if(!currentClientId)return;
+  const c=clients.find(x=>x.id===currentClientId);
+  if(!c)return;
+  const ns=parseInt(document.getElementById('cd-stage').value);
+  if(c.stage===ns)return;
+  c.stage=ns;
+  await sb.from('clients').update({stage:ns,updated_at:new Date().toISOString()}).eq('id',currentClientId);
+  await addActivity(`<strong>${c.name}</strong> movido para <strong>${CSN[ns]}</strong>`);
+  renderAll();
+  toast(`${c.name} → ${CSN[ns]}`,'success');
+}
+async function updateClientNotes(){
+  if(!currentClientId)return;
+  const c=clients.find(x=>x.id===currentClientId);
+  if(!c)return;
+  c.notes=document.getElementById('cd-notes').value;
+  await sb.from('clients').update({notes:c.notes,updated_at:new Date().toISOString()}).eq('id',currentClientId);
+}
+function openEditClient(){if(currentClientId){closeClientDetail();openEditClientModal(currentClientId);}}
+async function deleteClient(){
+  if(!currentClientId)return;
+  const c=clients.find(x=>x.id===currentClientId);
+  if(!c)return;
+  if(!confirm(`Excluir "${c.name}"?`))return;
+  await sb.from('clients').delete().eq('id',currentClientId);
+  clients=clients.filter(x=>x.id!==currentClientId);
+  await addActivity(`<strong>${c.name}</strong> excluído do pipeline comercial`);
+  closeClientDetail();
+  renderAll();
+  toast(`${c.name} excluído`,'info');
+}
 
 // ═══ UTILS ═══
 function toast(m,t='info'){const c=document.getElementById('toastContainer');const e=document.createElement('div');e.className='toast '+t;e.innerHTML=m;c.appendChild(e);setTimeout(()=>{e.style.opacity='0';e.style.transform='translateY(16px)';e.style.transition='all .3s';setTimeout(()=>e.remove(),300);},2500);}
