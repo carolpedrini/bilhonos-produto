@@ -42,6 +42,23 @@ html{scroll-behavior:smooth}
 body{font-family:var(--font-sans);background:var(--bg-deep);color:var(--text-secondary);min-height:100vh;overflow-x:hidden;line-height:1.6}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg-deep)}::-webkit-scrollbar-thumb{background:var(--gold-dark);border-radius:3px}
 
+/* ═══ PAGE LOGIN GATE ═══ */
+.gate-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg-deep);display:flex;align-items:center;justify-content:center}
+.gate-overlay.hidden{display:none}
+.gate-box{background:var(--bg-card);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-xl);padding:48px;max-width:420px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.5);position:relative;overflow:hidden}
+.gate-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.gate-field{width:100%;padding:13px 18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);color:var(--text-primary);font-family:var(--font-sans);font-size:.88rem;outline:none;transition:border-color .25s;margin-bottom:12px;text-align:center}
+.gate-field:focus{border-color:var(--gold-border)}
+.gate-field::placeholder{color:var(--text-muted);letter-spacing:.05em}
+.gate-error{font-size:.78rem;color:#c85a5a;margin-bottom:10px;display:none}
+.gate-error.visible{display:block}
+.gate-btn{width:100%;padding:13px;background:var(--gold);color:var(--bg-deep);border:none;border-radius:var(--radius-sm);font-family:var(--font-sans);font-size:.88rem;font-weight:600;cursor:pointer;transition:all .25s;letter-spacing:.05em}
+.gate-btn:hover{background:var(--gold-light);transform:translateY(-1px)}
+.gate-title{font-family:var(--font-serif);font-size:1.4rem;color:var(--text-primary);margin-bottom:8px}
+.gate-subtitle{font-size:.85rem;color:var(--text-muted);margin-bottom:24px}
+.gate-logo{margin-bottom:24px}
+.gate-logo svg{width:40px;height:28px}
+
 /* ═══ NAV ═══ */
 .nav{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(14,13,11,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);z-index:1000;display:flex;align-items:center}
 .nav-inner{width:100%;max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
@@ -251,6 +268,19 @@ footer a{color:var(--gold);text-decoration:none}
 </style>
 </head>
 <body>
+
+<!-- ═══ PAGE LOGIN GATE ═══ -->
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-box">
+    <div class="gate-logo"><svg width="40" height="28" viewBox="0 0 28 20" fill="none"><path d="M2 18L8 2L14 12L20 2L26 18" stroke="#c9a55c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="gate-title">Bilhon System</div>
+    <div class="gate-subtitle">Acesso restrito — digite suas credenciais</div>
+    <div class="gate-error" id="gateError">Credenciais incorretas. Tente novamente.</div>
+    <input type="text" class="gate-field" id="gateUser" placeholder="Usuário" autocomplete="off">
+    <input type="password" class="gate-field" id="gatePass" placeholder="Senha" onkeydown="if(event.key==='Enter')attemptGate()">
+    <button class="gate-btn" onclick="attemptGate()">Entrar</button>
+  </div>
+</div>
 
 <!-- ═══ NAV ═══ -->
 <nav class="nav"><div class="nav-inner">
@@ -573,6 +603,28 @@ document.querySelector('.orbital-section').addEventListener('click', function(e)
     closeOrbitalDetail();
   }
 });
+
+// ═══ PAGE GATE ═══
+function attemptGate(){
+  const u=document.getElementById('gateUser').value.trim().toLowerCase();
+  const p=document.getElementById('gatePass').value.trim();
+  if(u==='bilhon'&&p==='produto'){
+    localStorage.setItem('bos_gate','ok');
+    document.getElementById('gateOverlay').classList.add('hidden');
+    document.getElementById('gateError').classList.remove('visible');
+  } else {
+    document.getElementById('gateError').classList.add('visible');
+    document.getElementById('gatePass').value='';
+    document.getElementById('gatePass').focus();
+  }
+}
+(function(){
+  if(localStorage.getItem('bos_gate')==='ok'){
+    document.getElementById('gateOverlay').classList.add('hidden');
+  } else {
+    document.getElementById('gateUser').focus();
+  }
+})();
 </script>
 </body>
 </html>

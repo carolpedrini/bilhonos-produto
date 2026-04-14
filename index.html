@@ -27,7 +27,20 @@ html{scroll-behavior:smooth}
 body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-secondary);min-height:100vh;overflow-x:hidden;line-height:1.6}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg-deep)}::-webkit-scrollbar-thumb{background:var(--gold-dark);border-radius:3px}
 
-/* ═══ LOGIN GATE ═══ */
+/* ═══ PAGE LOGIN GATE ═══ */
+.gate-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg-deep);display:flex;align-items:center;justify-content:center}
+.gate-overlay.hidden{display:none}
+.gate-box{background:var(--bg-card);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-xl);padding:48px;max-width:420px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.5);position:relative;overflow:hidden}
+.gate-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.gate-field{width:100%;padding:13px 18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);color:var(--text-primary);font-family:var(--font-sans);font-size:.88rem;outline:none;transition:border-color .25s;margin-bottom:12px;text-align:center}
+.gate-field:focus{border-color:var(--gold-border)}
+.gate-field::placeholder{color:var(--text-muted);letter-spacing:.05em}
+.gate-error{font-size:.78rem;color:var(--accent-red);margin-bottom:10px;display:none}
+.gate-error.visible{display:block}
+.gate-btn{width:100%;padding:13px;background:var(--gold);color:var(--bg-deep);border:none;border-radius:var(--radius-sm);font-family:var(--font-sans);font-size:.88rem;font-weight:600;cursor:pointer;transition:all .25s;letter-spacing:.05em}
+.gate-btn:hover{background:var(--gold-light);transform:translateY(-1px)}
+
+/* ═══ ADMIN LOGIN GATE ═══ */
 .login-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:5000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
 .login-overlay.visible{display:flex}
 .login-box{background:var(--bg-card);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-xl);padding:48px;max-width:420px;width:90%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.5);position:relative;overflow:hidden}
@@ -378,7 +391,20 @@ footer{padding:32px;text-align:center;font-size:.72rem;color:var(--text-muted);b
 </head>
 <body class="viewer">
 
-<!-- ═══ LOGIN OVERLAY ═══ -->
+<!-- ═══ PAGE LOGIN GATE ═══ -->
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-box">
+    <div class="login-logo"><svg width="40" height="28" viewBox="0 0 28 20" fill="none"><path d="M2 18L8 2L14 12L20 2L26 18" stroke="#c9a55c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="login-title">PRODUTO.BOS</div>
+    <div class="login-subtitle" style="margin-bottom:24px">Acesso restrito — digite suas credenciais</div>
+    <div class="gate-error" id="gateError">Credenciais incorretas. Tente novamente.</div>
+    <input type="text" class="gate-field" id="gateUser" placeholder="Usuário" autocomplete="off">
+    <input type="password" class="gate-field" id="gatePass" placeholder="Senha" onkeydown="if(event.key==='Enter')attemptGate()">
+    <button class="gate-btn" onclick="attemptGate()">Entrar</button>
+  </div>
+</div>
+
+<!-- ═══ ADMIN LOGIN OVERLAY ═══ -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
     <button class="login-close" onclick="closeLogin()">×</button>
@@ -1110,8 +1136,31 @@ async function rejectIdea(inboxId) {
   toast(`Ideia rejeitada`, 'info');
 }
 
+// ═══ PAGE GATE ═══
+function attemptGate(){
+  const u=document.getElementById('gateUser').value.trim().toLowerCase();
+  const p=document.getElementById('gatePass').value.trim();
+  if(u==='bilhon'&&p==='produto'){
+    localStorage.setItem('bos_gate','ok');
+    document.getElementById('gateOverlay').classList.add('hidden');
+    document.getElementById('gateError').classList.remove('visible');
+  } else {
+    document.getElementById('gateError').classList.add('visible');
+    document.getElementById('gatePass').value='';
+    document.getElementById('gatePass').focus();
+  }
+}
+function checkGate(){
+  if(localStorage.getItem('bos_gate')==='ok'){
+    document.getElementById('gateOverlay').classList.add('hidden');
+  } else {
+    document.getElementById('gateUser').focus();
+  }
+}
+
 // ═══ INIT ═══
 document.addEventListener('DOMContentLoaded',async()=>{
+  checkGate();
   await loadData();
   // Check if Supabase session still exists
   const{data:{session}}=await sb.auth.getSession();
