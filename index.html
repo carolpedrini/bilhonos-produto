@@ -565,8 +565,9 @@ footer{padding:32px;text-align:center;font-size:.72rem;color:var(--text-muted);b
   <div class="modal-body">
     <input type="hidden" id="client-modal-id">
     <div class="form-group"><label class="form-label">Nome do Cliente / Empresa</label><input class="form-input" id="client-modal-name" placeholder="Ex: Passeios & Co."></div>
+    <div class="form-group"><label class="form-label">Produto de Interesse</label><select class="form-select" id="client-modal-product"><option value="">— Nenhum —</option></select></div>
     <div class="form-group"><label class="form-label">Link (Portal / Diagnóstico)</label><input class="form-input" id="client-modal-link" placeholder="https://..."></div>
-    <div class="form-group"><label class="form-label">Etapa</label><select class="form-select" id="client-modal-stage"><option value="1">Em Análise</option><option value="2">Vendido</option><option value="3">Descartado</option></select></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Etapa</label><select class="form-select" id="client-modal-stage"><option value="1">Em Análise</option><option value="2">Vendido</option><option value="3">Descartado</option></select></div></div>
     <div class="form-group"><label class="form-label">Anotações</label><textarea class="form-textarea" id="client-modal-notes" placeholder="Contexto, próximos passos, observações..." style="min-height:120px"></textarea></div>
     <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px"><button class="btn btn-secondary" onclick="closeClientModal()">Cancelar</button><button class="btn btn-primary" id="client-modal-save-btn" onclick="saveClient()">Criar Cliente</button></div>
   </div>
@@ -578,6 +579,7 @@ footer{padding:32px;text-align:center;font-size:.72rem;color:var(--text-muted);b
     <div class="client-detail-header"><h2 id="cd-name"></h2><button class="modal-close" onclick="closeClientDetail()">×</button></div>
     <div class="client-detail-body">
       <div id="cd-link-wrap" style="margin-bottom:20px"></div>
+      <div id="cd-product-wrap" style="margin-bottom:20px"></div>
       <div class="client-stage-select" style="margin-bottom:20px">
         <label class="form-label">Status</label>
         <select class="form-select" id="cd-stage" onchange="updateClientStage()"><option value="1">Em Análise</option><option value="2">Vendido</option><option value="3">Descartado</option></select>
@@ -694,7 +696,7 @@ async function loadData(){
 }
 async function loadClients(){
   const{data}=await sb.from('clients').select('*').order('created_at',{ascending:true});
-  clients=(data||[]).map(r=>({id:r.id,name:r.name,stage:r.stage,notes:r.notes||'',link:r.link||'',createdAt:r.created_at}));
+  clients=(data||[]).map(r=>({id:r.id,name:r.name,stage:r.stage,notes:r.notes||'',link:r.link||'',productId:r.product_id||'',createdAt:r.created_at}));
 }
 async function loadInbox(){
   const{data}=await sb.from('idea_inbox').select('*').eq('status','pending').order('created_at',{ascending:false});
@@ -874,11 +876,13 @@ function renderClientes(){
       h+=`<div class="stage-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="24" height="24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg><span>Vazio</span></div>`;
     } else {
       items.forEach(c=>{
+        const prod=c.productId?products.find(p=>p.id===c.productId):null;
+        const prodHtml=prod?`<div style="font-size:.68rem;color:var(--gold);opacity:.8;margin-bottom:2px"><span class="stage-dot stage-${prod.stage}" style="display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></span>${prod.name}</div>`:'';
         const linkHtml=c.link?`<a class="client-card-link" href="${c.link}" target="_blank" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>🔗 Acessar portal</a>`:'';
         const notesHtml=c.notes?`<div class="client-card-notes">${c.notes}</div>`:'';
         h+=`<div class="client-card" data-cs="${s}" data-client-id="${c.id}" draggable="true" onclick="openClientDetail('${c.id}')" ondragstart="dragClientStart(event,'${c.id}')">
           <div class="client-card-name">${c.name}</div>
-          ${linkHtml}${notesHtml}
+          ${prodHtml}${linkHtml}${notesHtml}
         </div>`;
       });
     }
@@ -894,13 +898,19 @@ async function dropClient(e,newStage){
   const id=e.dataTransfer.getData('text/plain');
   const c=clients.find(x=>x.id===id);
   if(!c||c.stage===newStage)return;
+  const oldStage=c.stage;
   c.stage=newStage;
   await sb.from('clients').update({stage:newStage,updated_at:new Date().toISOString()}).eq('id',id);
+  await handleClientSaleChange(c,oldStage,newStage);
   await addActivity(`<strong>${c.name}</strong> movido para <strong>${CSN[newStage]}</strong>`);
   renderAll();
   toast(`${c.name} → ${CSN[newStage]}`,'success');
 }
 
+function populateClientProductSelect(selectedId){
+  const sel=document.getElementById('client-modal-product');
+  sel.innerHTML='<option value="">— Nenhum —</option>'+products.map(p=>`<option value="${p.id}"${p.id===selectedId?' selected':''}>${p.name}</option>`).join('');
+}
 function openNewClientModal(){
   document.getElementById('client-modal-title').textContent='Novo Cliente';
   document.getElementById('client-modal-save-btn').textContent='Criar Cliente';
@@ -909,6 +919,7 @@ function openNewClientModal(){
   document.getElementById('client-modal-link').value='';
   document.getElementById('client-modal-stage').value='1';
   document.getElementById('client-modal-notes').value='';
+  populateClientProductSelect('');
   document.getElementById('clientModal').classList.add('visible');
   document.getElementById('client-modal-name').focus();
 }
@@ -922,6 +933,7 @@ function openEditClientModal(id){
   document.getElementById('client-modal-link').value=c.link||'';
   document.getElementById('client-modal-stage').value=c.stage;
   document.getElementById('client-modal-notes').value=c.notes||'';
+  populateClientProductSelect(c.productId||'');
   document.getElementById('clientModal').classList.add('visible');
 }
 function closeClientModal(){document.getElementById('clientModal').classList.remove('visible');}
@@ -931,15 +943,24 @@ async function saveClient(){
   const link=document.getElementById('client-modal-link').value.trim();
   const stage=parseInt(document.getElementById('client-modal-stage').value);
   const notes=document.getElementById('client-modal-notes').value.trim();
+  const productId=document.getElementById('client-modal-product').value;
   if(!name){toast('Nome obrigatório','warning');return;}
   if(id){
     const c=clients.find(x=>x.id===id);
-    if(c){c.name=name;c.link=link;c.stage=stage;c.notes=notes;}
-    await sb.from('clients').update({name,link,stage,notes,updated_at:new Date().toISOString()}).eq('id',id);
+    if(c){
+      const oldStage=c.stage;
+      const oldProductId=c.productId;
+      c.name=name;c.link=link;c.stage=stage;c.notes=notes;c.productId=productId;
+      // Sales: revert old state, apply new state
+      if(oldStage===2&&oldProductId){await adjustProductSales(oldProductId,-1);}
+      if(stage===2&&productId){await adjustProductSales(productId,1);}
+    }
+    await sb.from('clients').update({name,link,stage,notes,product_id:productId,updated_at:new Date().toISOString()}).eq('id',id);
     toast('Cliente atualizado','success');
   } else {
-    const{data}=await sb.from('clients').insert({name,link,stage,notes}).select().single();
-    if(data)clients.push({id:data.id,name,stage,notes,link,createdAt:data.created_at});
+    const{data}=await sb.from('clients').insert({name,link,stage,notes,product_id:productId}).select().single();
+    if(data)clients.push({id:data.id,name,stage,notes,link,productId,createdAt:data.created_at});
+    if(stage===2&&productId){await adjustProductSales(productId,1);}
     await addActivity(`<strong>${name}</strong> adicionado ao pipeline comercial`);
     toast('Cliente criado!','success');
   }
@@ -954,6 +975,13 @@ function openClientDetail(id){
   document.getElementById('cd-name').textContent=c.name;
   document.getElementById('cd-stage').value=c.stage;
   document.getElementById('cd-notes').value=c.notes||'';
+  // Product info
+  const prodWrap=document.getElementById('cd-product-wrap');
+  const prod=c.productId?products.find(p=>p.id===c.productId):null;
+  if(prod){
+    prodWrap.innerHTML=`<div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-sm)"><span class="stage-dot stage-${prod.stage}" style="display:inline-block;width:8px;height:8px;border-radius:50%"></span><span style="font-size:.82rem;color:var(--text-primary);font-weight:500">${prod.name}</span><span style="font-size:.7rem;color:var(--text-muted);margin-left:auto">${SN[prod.stage]}</span></div>`;
+  } else { prodWrap.innerHTML=''; }
+  // Link
   const linkWrap=document.getElementById('cd-link-wrap');
   if(c.link){
     linkWrap.innerHTML=`<a href="${c.link}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(201,165,92,.08);border:1px solid var(--gold-border);border-radius:var(--radius-sm);color:var(--gold);text-decoration:none;font-size:.85rem;font-weight:600;transition:all .25s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>🔗 Acessar Portal</a>`;
@@ -967,8 +995,10 @@ async function updateClientStage(){
   if(!c)return;
   const ns=parseInt(document.getElementById('cd-stage').value);
   if(c.stage===ns)return;
+  const oldStage=c.stage;
   c.stage=ns;
   await sb.from('clients').update({stage:ns,updated_at:new Date().toISOString()}).eq('id',currentClientId);
+  await handleClientSaleChange(c,oldStage,ns);
   await addActivity(`<strong>${c.name}</strong> movido para <strong>${CSN[ns]}</strong>`);
   renderAll();
   toast(`${c.name} → ${CSN[ns]}`,'success');
@@ -986,12 +1016,27 @@ async function deleteClient(){
   const c=clients.find(x=>x.id===currentClientId);
   if(!c)return;
   if(!confirm(`Excluir "${c.name}"?`))return;
+  // If was Vendido, revert the sale
+  if(c.stage===2&&c.productId){await adjustProductSales(c.productId,-1);}
   await sb.from('clients').delete().eq('id',currentClientId);
   clients=clients.filter(x=>x.id!==currentClientId);
   await addActivity(`<strong>${c.name}</strong> excluído do pipeline comercial`);
   closeClientDetail();
   renderAll();
   toast(`${c.name} excluído`,'info');
+}
+
+// Sales adjustment helpers
+async function adjustProductSales(productId,delta){
+  const p=products.find(x=>x.id===productId);
+  if(!p)return;
+  p.sales=Math.max(0,(p.sales||0)+delta);
+  await sb.from('products').update({sales:p.sales,updated_at:new Date().toISOString()}).eq('id',productId);
+}
+async function handleClientSaleChange(client,oldStage,newStage){
+  if(!client.productId)return;
+  if(oldStage!==2&&newStage===2){await adjustProductSales(client.productId,1);}
+  if(oldStage===2&&newStage!==2){await adjustProductSales(client.productId,-1);}
 }
 
 // ═══ UTILS ═══
