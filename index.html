@@ -1166,6 +1166,23 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const{data:{session}}=await sb.auth.getSession();
   if(session)isAdmin=true;
   applyMode();
+  // One-time migration: rename products (runs once when admin)
+  if(session&&!localStorage.getItem('bos_rename_v1')){
+    const renames=[
+      {id:'sales-bos-mnx5bln0',name:'Bilhon OS Sales',description:'CRM com IA, squads, qualificação de Leads'},
+      {id:'people-bos-mnufq60z',name:'Bilhon OS People',description:'Onboarding e contratação'},
+      {id:'ads-boss-mnx5bwrj',name:'Bilhon OS Ads',description:'Gestão de tráfego, squads Meta'},
+      {id:'midia-bos-mnx5ad0r',name:'Bilhon OS Social',description:'Distribuição de conteúdo e criação de cortes, clips, para redes sociais'}
+    ];
+    for(const r of renames){
+      await sb.from('products').update({name:r.name,description:r.description}).eq('id',r.id);
+      const p=products.find(x=>x.id===r.id);
+      if(p){p.name=r.name;p.desc=r.description;}
+    }
+    localStorage.setItem('bos_rename_v1','done');
+    renderAll();
+    console.log('[Migration] Product names updated to Bilhon OS standard');
+  }
   setTimeout(()=>{document.querySelectorAll('.page-view.active .fade-up').forEach(e=>e.classList.add('visible'));},200);
 });
 </script>
