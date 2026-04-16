@@ -1130,7 +1130,7 @@ async function updateClientNotes(){
   c.notes=document.getElementById('cd-notes').value;
   await sb.from('clients').update({notes:c.notes,updated_at:new Date().toISOString()}).eq('id',currentClientId);
 }
-function openEditClient(){if(currentClientId){closeClientDetail();openEditClientModal(currentClientId);}}
+function openEditClient(){if(currentClientId){const id=currentClientId;closeClientDetail();openEditClientModal(id);}}
 async function deleteClient(){
   if(!currentClientId)return;
   const c=clients.find(x=>x.id===currentClientId);
