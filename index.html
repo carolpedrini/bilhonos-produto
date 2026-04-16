@@ -959,7 +959,9 @@ function renderClientesPipeline(wrap){
 function renderClientesPortfolio(wrap){
   const activeClients=clients.filter(c=>c.stage===1||c.stage===2);
   let h='';
-  products.forEach(p=>{
+  // Only products from DNA Desenvolvido (stage 3+), most advanced first
+  const portfolioProducts=[...products].filter(p=>p.stage>=3).sort((a,b)=>b.stage-a.stage);
+  portfolioProducts.forEach(p=>{
     const pClients=activeClients.filter(c=>c.productId===p.id);
     const initials=p.name.replace('Bilhon OS ','').substring(0,2).toUpperCase();
     h+=`<div class="portfolio-section">
